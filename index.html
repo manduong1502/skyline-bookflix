@@ -1987,12 +1987,27 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
       });
     }
 
+    const CDN_MIRROR_BASE = 'https://manduong1502.github.io/skyline-bookflix/';
+
+    function resolveAssetUrl(relOrAbs) {
+      if (!relOrAbs) return '';
+      if (relOrAbs.startsWith('data:') || relOrAbs.startsWith('http://') || relOrAbs.startsWith('https://') || relOrAbs.startsWith('blob:')) {
+        return relOrAbs;
+      }
+      if (typeof location !== 'undefined' && location.hostname.includes('surge.sh')) {
+        return CDN_MIRROR_BASE + relOrAbs.replace(/^\/+/, '');
+      }
+      return relOrAbs;
+    }
+
     function getBookCover(book) {
-      return customCoverMap[book.id] || book.cover || `covers/book_${book.id}.jpg?v=3`;
+      const raw = customCoverMap[book.id] || book.cover || `covers/book_${book.id}.jpg?v=3`;
+      return resolveAssetUrl(raw);
     }
 
     function getBookAudio(book) {
-      return customAudioMap[book.id] || book.audio || `audio/book_${book.id}.mp3?v=2`;
+      const raw = customAudioMap[book.id] || book.audio || `audio/book_${book.id}.mp3?v=2`;
+      return resolveAssetUrl(raw);
     }
 
     function getBookPodcastScript(book) {
@@ -2394,7 +2409,7 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
       return `
         <article class="book-card" onclick="openBookModal(${book.id})">
           <div class="book-cover" style="background: ${book.gradient};">
-            <img class="cover-img" src="${coverSrc}" alt="${book.title}" loading="lazy" onerror="this.style.display='none'" />
+            <img class="cover-img" src="${coverSrc}" alt="${book.title}" loading="lazy" onerror="if(!this.dataset.cdnTried){this.dataset.cdnTried=1;this.src='https://manduong1502.github.io/skyline-bookflix/covers/book_${book.id}.jpg?v=3';}else{this.style.display='none';}" />
             <div class="book-cover-overlay">
               <div class="cover-top-badges">
                 ${hasClubAudio
