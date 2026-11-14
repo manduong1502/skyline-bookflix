@@ -801,6 +801,10 @@
     }
     body.parent-readonly-mode .btn-change-cover,
     body.parent-readonly-mode .studio-upload-bar,
+    body.parent-readonly-mode #btnEditHookToggle,
+    body.parent-readonly-mode #editHookBox,
+    body.parent-readonly-mode #btnEditQuizToggle,
+    body.parent-readonly-mode #editQuizBox,
     body.parent-readonly-mode #btnEditScriptToggle,
     body.parent-readonly-mode #editScriptBox,
     body.parent-readonly-mode #cloudSyncBadge,
@@ -984,8 +988,19 @@
             <span class="badge-location" id="modalLocation"></span>
           </div>
           <h2 style="font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.25;" id="modalTitle"></h2>
-          <div style="font-size:0.88rem; color:#fde68a; font-weight:600; margin-bottom:10px;" id="modalAuthor"></div>
-          <p style="font-size:0.92rem; color:#f1f5f9; line-height:1.55;" id="modalHook"></p>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <div style="font-size:0.88rem; color:#fde68a; font-weight:600;" id="modalAuthor"></div>
+            <button class="btn-small" id="btnEditHookToggle" style="padding:3px 10px; font-size:0.72rem; background:rgba(56,189,248,0.18); border-color:rgba(56,189,248,0.5); color:#bae6fd;" onclick="toggleEditHook()">✏️ Sửa câu giới thiệu Trailer</button>
+          </div>
+          <p style="font-size:0.92rem; color:#f1f5f9; line-height:1.55; background:rgba(0,0,0,0.22); padding:9px 12px; border-radius:8px; border-left:3px solid #e50914;" id="modalHook"></p>
+          <div id="editHookBox" style="display:none; margin-top:8px; background:rgba(0,0,0,0.35); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.35);">
+            <label style="font-size:0.74rem; color:#bae6fd; font-weight:700;">🎬 Chỉnh sửa lời giới thiệu kiểu Trailer Netflix (2 câu gây tò mò):</label>
+            <textarea id="editHookTextarea" class="prompt-textarea" style="min-height:66px; color:#fff; font-family:inherit; font-size:0.85rem; margin-top:5px;"></textarea>
+            <div style="display:flex; gap:8px; margin-top:6px;">
+              <button class="btn-small" style="background:#10b981; border-color:#10b981; color:#fff;" onclick="saveEditedHook()">💾 Lưu câu Trailer mới</button>
+              <button class="btn-small" onclick="toggleEditHook()">Đóng</button>
+            </div>
+          </div>
           <div class="mood-tags-row" id="modalTags" style="margin-top:10px;"></div>
         </div>
       </div>
@@ -1063,8 +1078,35 @@
 
         <!-- MINI QUIZ -->
         <div class="quiz-box">
-          <strong style="color:#7dd3fc; font-size:0.92rem;">🎯 Thử Thách Đố Vui 10 Giây (Trả lời đúng để nhận gợi ý mượn sách!)</strong>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <strong style="color:#7dd3fc; font-size:0.92rem;">🎯 Thử Thách Đố Vui 10 Giây (Trả lời đúng để nhận gợi ý mượn sách!)</strong>
+            <button class="btn-small" id="btnEditQuizToggle" style="padding:3px 9px; font-size:0.7rem;" onclick="toggleEditQuiz()">✏️ Sửa câu hỏi Quiz</button>
+          </div>
           <p style="font-size:0.92rem; color:#fff; font-weight:600; margin-top:8px;" id="modalQuizQuestion"></p>
+          <div id="editQuizBox" style="display:none; margin-top:8px; margin-bottom:10px; background:rgba(0,0,0,0.35); padding:10px; border-radius:8px; border:1px solid rgba(56,189,248,0.35);">
+            <div style="margin-bottom:6px;">
+              <label style="font-size:0.73rem; color:#bae6fd; font-weight:700;">Câu hỏi Đố vui:</label>
+              <input type="text" id="editQuizQInput" class="modal-input" style="margin-top:3px;" />
+            </div>
+            <div class="form-grid-2" style="margin-bottom:6px;">
+              <div>
+                <label style="font-size:0.73rem; color:#4ade80; font-weight:700;">✅ Đáp án đúng:</label>
+                <input type="text" id="editQuizAnsInput" class="modal-input" style="margin-top:3px;" />
+              </div>
+              <div>
+                <label style="font-size:0.73rem; color:#fca5a5; font-weight:700;">❌ Đáp án sai 1:</label>
+                <input type="text" id="editQuizWrong1Input" class="modal-input" style="margin-top:3px;" />
+              </div>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:0.73rem; color:#fca5a5; font-weight:700;">❌ Đáp án sai 2:</label>
+              <input type="text" id="editQuizWrong2Input" class="modal-input" style="margin-top:3px;" />
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-small" style="background:#10b981; border-color:#10b981; color:#fff;" onclick="saveEditedQuiz()">💾 Lưu bộ câu hỏi Quiz mới</button>
+              <button class="btn-small" onclick="toggleEditQuiz()">Đóng</button>
+            </div>
+          </div>
           <div id="modalQuizOptions"></div>
           <div id="modalQuizFeedback" style="margin-top:10px; font-size:0.85rem; display:none;"></div>
         </div>
@@ -2010,6 +2052,12 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
       return resolveAssetUrl(raw);
     }
 
+    let customHookMap = JSON.parse(localStorage.getItem('skyline_custom_hooks') || '{}');
+
+    function getBookHook(book) {
+      return customHookMap[book.id] || book.hook;
+    }
+
     function getBookPodcastScript(book) {
       return customScriptMap[book.id] || book.podcast;
     }
@@ -2426,7 +2474,7 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
                 <span class="match-score" title="${tooltip}" style="cursor:help;">${pct}% Match</span>
                 <span class="author-name" title="${book.author}">${book.author}</span>
               </div>
-              <p class="book-Hook" style="margin-top:5px;">${book.hook}</p>
+              <p class="book-Hook" style="margin-top:5px;">${getBookHook(book)}</p>
             </div>
             <div class="mood-tags-row">
               ${book.moods.map(m => `<span class="mood-tag">#${m}</span>`).join('')}
@@ -2449,7 +2497,7 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
       const book = BOOKS_DATA.find(b => b.id === bookId) || BOOKS_DATA[0];
       currentHeroBookId = book.id;
       document.getElementById('heroTitle').textContent = book.title;
-      document.getElementById('heroDesc').textContent = book.hook;
+      document.getElementById('heroDesc').textContent = getBookHook(book);
       document.getElementById('heroLocation').textContent = '📍 ' + book.location;
       document.getElementById('heroGradeBadge').textContent = book.grades;
       document.getElementById('heroAuthor').textContent = book.author;
@@ -2584,7 +2632,15 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
       document.getElementById('modalLocation').textContent = '📍 ' + book.location;
       document.getElementById('modalTitle').textContent = book.title;
       document.getElementById('modalAuthor').textContent = 'Tác giả / NXB: ' + book.author;
-      document.getElementById('modalHook').textContent = book.hook;
+      const hookText = getBookHook(book);
+      document.getElementById('modalHook').textContent = hookText;
+      document.getElementById('editHookTextarea').value = hookText;
+      document.getElementById('editHookBox').style.display = 'none';
+      document.getElementById('editQuizBox').style.display = 'none';
+      document.getElementById('editQuizQInput').value = book.quizQ || '';
+      document.getElementById('editQuizAnsInput').value = book.quizAns || '';
+      document.getElementById('editQuizWrong1Input').value = (book.quizWrongs && book.quizWrongs[0]) || '';
+      document.getElementById('editQuizWrong2Input').value = (book.quizWrongs && book.quizWrongs[1]) || '';
 
       const scriptText = getBookPodcastScript(book);
       document.getElementById('modalPodcastScript').textContent = '"' + scriptText + '"';
@@ -2782,6 +2838,55 @@ Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh ph
         await uploadCoverToCloud(bookId, compressedDataUrl);
       };
       reader.readAsDataURL(file);
+    }
+
+    function toggleEditHook() {
+      const box = document.getElementById('editHookBox');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function saveEditedHook() {
+      if (!activeModalBook) return;
+      const newHook = document.getElementById('editHookTextarea').value.trim();
+      if (!newHook) return;
+      const bookId = activeModalBook.id;
+      activeModalBook.hook = newHook;
+      customHookMap[bookId] = newHook;
+      localStorage.setItem('skyline_custom_hooks', JSON.stringify(customHookMap));
+      saveToStore("customBooks", "latest", BOOKS_DATA);
+      document.getElementById('modalHook').textContent = newHook;
+      document.getElementById('editHookBox').style.display = 'none';
+      if (currentHeroBookId === bookId) {
+        document.getElementById('heroDesc').textContent = newHook;
+      }
+      renderShelves();
+      syncCustomBooksToCloud(BOOKS_DATA).catch(() => {});
+      alert('✅ Đã lưu câu giới thiệu Trailer mới và cập nhật lên Kệ sách & Đám mây!');
+    }
+
+    function toggleEditQuiz() {
+      const box = document.getElementById('editQuizBox');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function saveEditedQuiz() {
+      if (!activeModalBook) return;
+      const q = document.getElementById('editQuizQInput').value.trim();
+      const ans = document.getElementById('editQuizAnsInput').value.trim();
+      const w1 = document.getElementById('editQuizWrong1Input').value.trim() || 'Phương án khác A';
+      const w2 = document.getElementById('editQuizWrong2Input').value.trim() || 'Phương án khác B';
+      if (!q || !ans) {
+        alert('Thầy/Cô vui lòng nhập đầy đủ Câu hỏi và Đáp án đúng nhé!');
+        return;
+      }
+      activeModalBook.quizQ = q;
+      activeModalBook.quizAns = ans;
+      activeModalBook.quizWrongs = [w1, w2];
+      saveToStore("customBooks", "latest", BOOKS_DATA);
+      document.getElementById('editQuizBox').style.display = 'none';
+      openBookModal(activeModalBook.id);
+      syncCustomBooksToCloud(BOOKS_DATA).catch(() => {});
+      alert('✅ Đã lưu bộ câu hỏi Đố vui Quiz mới và đồng bộ Đám mây!');
     }
 
     function toggleEditScript() {
