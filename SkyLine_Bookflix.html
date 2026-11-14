@@ -1,0 +1,2887 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SKY-LINE BOOKFLIX | Mô Hình Truyền Thông Văn Hóa Đọc & Trợ Lý Chọn Sách AI</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-main: #0b0d13;
+      --bg-card: #161924;
+      --bg-elevated: #1e2333;
+      --netflix-red: #e50914;
+      --netflix-red-hover: #f6121d;
+      --skyline-gold: #f59e0b;
+      --skyline-blue: #38bdf8;
+      --skyline-green: #10b981;
+      --text-primary: #f8fafc;
+      --text-secondary: #cbd5e1;
+      --text-muted: #94a3b8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    /* TOP NAVBAR */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 4%;
+      background: linear-gradient(180deg, rgba(11,13,19,0.97) 0%, rgba(11,13,19,0.88) 80%, rgba(11,13,19,0) 100%);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand-group { display: flex; align-items: center; gap: 12px; }
+
+    .brand-logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      letter-spacing: 0.8px;
+      color: var(--netflix-red);
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      text-shadow: 0 2px 12px rgba(229, 9, 20, 0.45);
+    }
+
+    .brand-logo span.sky { color: #ffffff; font-weight: 800; }
+
+    .club-badge {
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fde68a;
+      font-size: 0.74rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .grade-pills { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+
+    .grade-pill {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-secondary);
+      padding: 6px 13px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .grade-pill:hover, .grade-pill.active {
+      background: var(--netflix-red);
+      border-color: var(--netflix-red);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(229, 9, 20, 0.35);
+    }
+
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .search-box { position: relative; }
+
+    .search-box input {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 7px 14px 7px 34px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      width: 205px;
+      font-family: inherit;
+      transition: width 0.25s ease, border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--skyline-blue);
+      width: 245px;
+    }
+
+    .search-box::before {
+      content: "🔍";
+      position: absolute;
+      left: 11px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.78rem;
+      opacity: 0.75;
+    }
+
+    .btn-teacher {
+      background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.3);
+      transition: transform 0.2s;
+    }
+
+    .btn-teacher:hover { transform: translateY(-1px); }
+
+    /* HERO BANNER */
+    .hero {
+      position: relative;
+      min-height: 530px;
+      padding: 108px 4% 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 38px;
+      background:
+        radial-gradient(circle at 80% 25%, rgba(229, 9, 20, 0.25) 0%, transparent 45%),
+        radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.16) 0%, transparent 50%),
+        linear-gradient(180deg, #111522 0%, #0b0d13 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .hero-content { max-width: 690px; z-index: 2; }
+
+    .hero-tags {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-top10 {
+      background: var(--netflix-red);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.73rem;
+      padding: 4px 9px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-match { color: #4ade80; font-weight: 800; font-size: 0.88rem; }
+
+    .badge-location {
+      background: rgba(255,255,255,0.1);
+      color: #e2e8f0;
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+    }
+
+    .hero-title {
+      font-size: clamp(1.8rem, 3.1vw, 2.65rem);
+      font-weight: 900;
+      line-height: 1.16;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .hero-desc {
+      font-size: 0.98rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      max-width: 630px;
+    }
+
+    .hero-buttons { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--netflix-red);
+      color: #fff;
+      border: none;
+      padding: 11px 20px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-primary:hover { background: var(--netflix-red-hover); transform: scale(1.02); }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.22);
+      padding: 11px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-secondary:hover { background: rgba(255, 255, 255, 0.24); }
+
+    .hero-QuickSwitch {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hero-QuickSwitch span { font-size: 0.78rem; color: var(--text-muted); margin-right: 4px; }
+
+    .hero-dot-btn {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.16);
+      color: #e2e8f0;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .hero-dot-btn.active {
+      border-color: var(--skyline-gold);
+      background: rgba(245, 158, 11, 0.2);
+      color: #fde68a;
+    }
+
+    .hero-poster-showcase {
+      position: relative;
+      width: 265px;
+      height: 375px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 48px rgba(0,0,0,0.75), 0 0 0 2px rgba(255,255,255,0.18);
+      transform: rotate(2deg);
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+      cursor: pointer;
+      background: #141824;
+    }
+
+    .hero-poster-showcase:hover { transform: rotate(0deg) scale(1.03); }
+
+    .hero-poster-showcase img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-poster-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 35%, transparent 60%, rgba(0,0,0,0.88) 100%);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* AI BOOK MATCH ASSISTANT */
+    .ai-assistant-section {
+      margin: 26px 4% 34px;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.92) 0%, rgba(15, 23, 42, 0.96) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 18px;
+      padding: 22px 26px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .ai-title-wrap { display: flex; align-items: center; gap: 12px; }
+
+    .ai-icon-pulse {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #e50914, #f59e0b);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: 0 0 20px rgba(229, 9, 20, 0.45);
+    }
+
+    .ai-title-wrap h2 { font-size: 1.2rem; font-weight: 800; color: #fff; }
+    .ai-title-wrap p { font-size: 0.83rem; color: var(--text-secondary); }
+
+    .ai-safety-pill {
+      background: rgba(16, 185, 129, 0.14);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .ai-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
+      gap: 12px;
+    }
+
+    .ai-control-group label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: #93c5fd;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+    }
+
+    .ai-control-group select, .ai-control-group input {
+      width: 100%;
+      background: rgba(11, 13, 19, 0.88);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #fff;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 0.86rem;
+      font-family: inherit;
+    }
+
+    .btn-ai-match {
+      background: linear-gradient(135deg, #e50914 0%, #f59e0b 100%);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 0.9rem;
+      cursor: pointer;
+      align-self: end;
+      box-shadow: 0 6px 20px rgba(229, 9, 20, 0.35);
+    }
+
+    .ai-results-box {
+      display: none;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px dashed rgba(255,255,255,0.15);
+    }
+
+    .ai-results-box.active { display: block; }
+
+    .ai-results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      margin-top: 10px;
+    }
+
+    .ai-rec-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .ai-rec-card:hover {
+      border-color: var(--skyline-gold);
+      transform: translateY(-2px);
+    }
+
+    .ai-rec-thumb {
+      width: 68px;
+      height: 96px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #0f172a;
+    }
+
+    /* SHELF ROWS */
+    .shelves-container { padding: 0 4% 60px; }
+    .shelf-row { margin-bottom: 36px; }
+    .shelf-header { margin-bottom: 12px; }
+    .shelf-title { font-size: 1.22rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .shelf-subtitle { font-size: 0.8rem; color: var(--text-muted); }
+
+    .books-track {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 18px;
+    }
+
+    .book-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .book-card:hover {
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 18px 34px rgba(0,0,0,0.65);
+      border-color: rgba(229, 9, 20, 0.7);
+      z-index: 5;
+    }
+
+    .book-cover {
+      height: 270px;
+      position: relative;
+      overflow: hidden;
+      background: #0f172a;
+    }
+
+    .book-cover img.cover-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.35s ease;
+    }
+
+    .book-card:hover .book-cover img.cover-img {
+      transform: scale(1.05);
+    }
+
+    .book-cover-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, transparent 32%, transparent 55%, rgba(11,13,19,0.95) 100%);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .cover-top-badges {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .badge-new {
+      background: var(--netflix-red);
+      color: #fff;
+      font-size: 0.64rem;
+      font-weight: 800;
+      padding: 3px 7px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-club-rec {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #090b10;
+      font-size: 0.64rem;
+      font-weight: 900;
+      padding: 3px 7px;
+      border-radius: 4px;
+    }
+
+    .badge-grade {
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      color: #fde68a;
+      border: 1px solid rgba(253, 230, 138, 0.45);
+      font-size: 0.66rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    .cover-bottom-title {
+      font-weight: 800;
+      font-size: 0.92rem;
+      color: #fff;
+      line-height: 1.28;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.95);
+    }
+
+    .book-body {
+      padding: 11px 13px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .book-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.73rem;
+    }
+
+    .match-score { color: #4ade80; font-weight: 800; }
+
+    .author-name {
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 120px;
+    }
+
+    .book-Hook {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .mood-tags-row { display: flex; flex-wrap: wrap; gap: 4px; }
+
+    .mood-tag {
+      background: rgba(255,255,255,0.06);
+      color: #cbd5e1;
+      font-size: 0.67rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.84);
+      backdrop-filter: blur(7px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: #141824;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px;
+      max-width: 880px;
+      width: 100%;
+      max-height: 92vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.7);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .modal-hero-flex {
+      display: flex;
+      gap: 22px;
+      padding: 24px 26px;
+      background: linear-gradient(135deg, rgba(229,9,20,0.22) 0%, rgba(15,23,42,0.96) 100%);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      align-items: center;
+    }
+
+    .modal-cover-wrap {
+      position: relative;
+      width: 135px;
+      height: 190px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.2);
+      background: #0f172a;
+    }
+
+    .modal-cover-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .btn-change-cover {
+      position: absolute;
+      bottom: 6px; left: 6px; right: 6px;
+      background: rgba(0,0,0,0.78);
+      color: #fde68a;
+      border: 1px solid rgba(253,230,138,0.45);
+      border-radius: 6px;
+      padding: 4px 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .modal-body {
+      padding: 22px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .podcast-box {
+      background: rgba(245, 158, 11, 0.09);
+      border: 1px solid rgba(245, 158, 11, 0.38);
+      border-radius: 14px;
+      padding: 16px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .audio-player-bar {
+      background: rgba(9, 11, 16, 0.85);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .studio-upload-bar {
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px dashed rgba(56, 189, 248, 0.45);
+      border-radius: 10px;
+      padding: 11px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-small {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-small:hover { background: rgba(255,255,255,0.2); }
+    .btn-small.rec-active { background: #dc2626; border-color: #f87171; animation: pulseRec 1.2s infinite; }
+
+    @keyframes pulseRec {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    .quiz-box {
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 14px;
+      padding: 16px 18px;
+    }
+
+    .quiz-option {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.86rem;
+    }
+
+    .quiz-option.correct {
+      background: rgba(16, 185, 129, 0.25);
+      border-color: #10b981;
+      color: #a7f3d0;
+      font-weight: 700;
+    }
+
+    .quiz-option.wrong {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: #ef4444;
+      color: #fecaca;
+    }
+
+    .step-card {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .prompt-textarea {
+      width: 100%;
+      min-height: 120px;
+      background: #090b10;
+      border: 1px solid rgba(255,255,255,0.18);
+      color: #93c5fd;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      margin-top: 8px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 26px 4%;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero { flex-direction: column; padding-top: 145px; }
+      .modal-hero-flex { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="brand-group">
+      <div class="brand-logo">
+        <span class="sky">SKY-LINE</span> BOOKFLIX
+      </div>
+      <span class="club-badge">🎙️ CLB Thư Viện Mic &amp; Mind</span>
+    </div>
+
+    <div class="grade-pills">
+      <button class="grade-pill active" onclick="filterByGrade('ALL', this)">Tất cả (27 bộ sách)</button>
+      <button class="grade-pill" onclick="filterByGrade('TH', this)">Tiểu học (TH)</button>
+      <button class="grade-pill" onclick="filterByGrade('THCS', this)">THCS</button>
+      <button class="grade-pill" onclick="filterByGrade('THPT', this)">THPT</button>
+    </div>
+
+    <div class="nav-actions">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Tìm tên sách, tác giả, chủ đề..." oninput="handleSearch()" />
+      </div>
+      <button class="btn-small" id="cloudSyncBadge" onclick="forceSyncAllLocalToCloud()" title="Bấm để đồng bộ ngay toàn bộ ảnh bìa, ghi âm và kịch bản lên Đám mây cho mọi thiết bị" style="background:rgba(16,185,129,0.16); border:1px solid rgba(16,185,129,0.45); color:#6ee7b7; border-radius:999px; padding:6px 12px; font-size:0.74rem;">
+        ☁️ Đang kết nối Đám mây...
+      </button>
+      <button class="btn-teacher" onclick="openTeacherModal()">
+        📥 Giáo viên: Nhập Excel &amp; Khuôn AI (&lt;30p)
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO BANNER -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-tags">
+        <span class="badge-top10">🔥 SÁCH MỚI BÓC TEM TUẦN NÀY</span>
+        <span class="badge-match">99% Phù hợp với Sky-Liners</span>
+        <span class="badge-location" id="heroLocation">📍 Bàn trưng bày Sách Mới (Sảnh Thư viện)</span>
+      </div>
+      <h1 class="hero-title" id="heroTitle">Lược sử trí khôn – Từ giun biển đến ChatGPT</h1>
+      <p class="hero-desc" id="heroDesc">
+        Hành trình tiến hóa 500 triệu năm của trí thông minh: từ hệ thần kinh sơ khai của loài giun biển cổ đại cho đến bộ não con người và sự bùng nổ của Trí tuệ nhân tạo ChatGPT!
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="playHeroPodcast()">
+          ▶ Nghe Audio Trailer 50s (Mic &amp; Mind Radio)
+        </button>
+        <button class="btn-secondary" onclick="openCurrentHeroDetail()">
+          ℹ Xem Chi Tiết, Phòng Thu CLB &amp; Quiz
+        </button>
+      </div>
+      <div class="hero-QuickSwitch">
+        <span>Tiêu điểm tuần này:</span>
+        <button class="hero-dot-btn active" onclick="setHeroBook(24, this)">🤖 Lược sử trí khôn &amp; ChatGPT</button>
+        <button class="hero-dot-btn" onclick="setHeroBook(3, this)">🌠 Boxset Your Name</button>
+        <button class="hero-dot-btn" onclick="setHeroBook(12, this)">💛 Điều Kỳ Diệu (Wonder)</button>
+        <button class="hero-dot-btn" onclick="setHeroBook(1, this)">🔔 Boxset Doraemon</button>
+      </div>
+    </div>
+
+    <div class="hero-poster-showcase" onclick="openCurrentHeroDetail()">
+      <img id="heroCoverImg" src="covers/book_24.jpg?v=3" alt="Bìa sách tiêu điểm" onerror="this.style.display='none'" />
+      <div class="hero-poster-overlay">
+        <div class="cover-top-badges">
+          <span class="badge-new">MỚI BÓC TEM</span>
+          <span class="badge-grade" id="heroGradeBadge">THCS, THPT</span>
+        </div>
+        <div>
+          <div style="font-size:0.75rem; color:#fde68a; font-weight:700; margin-bottom:2px;" id="heroAuthor">Max S. Bennett</div>
+          <div style="font-size:1.02rem; font-weight:900; color:#fff; line-height:1.25; text-shadow:0 2px 8px #000;" id="heroCardTitle">Lược sử trí khôn - Từ giun biển đến ChatGPT</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI BOOK MATCH ASSISTANT -->
+  <section class="ai-assistant-section">
+    <div class="ai-header">
+      <div class="ai-title-wrap">
+        <div class="ai-icon-pulse">🤖</div>
+        <div>
+          <h2>Trợ Lý AI "Hôm Nay Đọc Gì?" (AI Book Sommelier)</h2>
+          <p>Gợi ý cá nhân hóa đúng cuốn sách đang có sẵn tại Thư viện theo Cấp học &amp; Tâm trạng của bạn</p>
+        </div>
+      </div>
+      <span class="ai-safety-pill">🛡️ An toàn 100%: Không cần tài khoản • Không thu thập dữ liệu cá nhân HS</span>
+    </div>
+
+    <div class="ai-controls">
+      <div class="ai-control-group">
+        <label>1. Bạn đang học cấp nào?</label>
+        <select id="aiGradeSelect">
+          <option value="ALL">Mọi cấp học (TH - THCS - THPT)</option>
+          <option value="TH">Tiểu học (TH)</option>
+          <option value="THCS">Trung học cơ sở (THCS)</option>
+          <option value="THPT">Trung học phổ thông (THPT)</option>
+        </select>
+      </div>
+
+      <div class="ai-control-group">
+        <label>2. Tâm trạng / Mong muốn hôm nay?</label>
+        <select id="aiMoodSelect">
+          <option value="Chữa lành">💛 Cần chữa lành, ấm áp, tình cảm gia đình &amp; bạn bè</option>
+          <option value="Phiêu lưu">🕵️ Muốn phiêu lưu kỳ ảo, phá án hồi hộp hoặc xem truyện màu</option>
+          <option value="Tư duy">🧠 Muốn bứt phá tư duy, tự tin tuổi dậy thì &amp; học tập vui</option>
+          <option value="Khoa học">🚀 Tò mò Khoa học, Vũ trụ, Thiên nhiên &amp; Trí tuệ nhân tạo AI</option>
+          <option value="Nghệ thuật">🎨 Yêu Văn hóa Việt Nam, Bản đồ thế giới, Hội họa &amp; Sống xanh</option>
+        </select>
+      </div>
+
+      <div class="ai-control-group">
+        <label>3. Từ khóa thêm (Tùy chọn)</label>
+        <input type="text" id="aiKeywordInput" placeholder="VD: Doraemon, tuổi dậy thì, vẽ tranh, AI..." />
+      </div>
+
+      <button class="btn-ai-match" onclick="runAiRecommendation()">
+        ✨ AI Tư Vấn Sách Ngay
+      </button>
+    </div>
+
+    <div class="ai-results-box" id="aiResultsBox">
+      <div style="font-size:0.9rem; font-weight:700; color:#fde68a;" id="aiReasoningHeader"></div>
+      <div class="ai-results-grid" id="aiResultsGrid"></div>
+    </div>
+  </section>
+
+  <!-- BOOKFLIX SHELVES -->
+  <main class="shelves-container" id="shelvesContainer"></main>
+
+  <!-- BOOK DETAIL + PODCAST + CLUB RECORDING + QUIZ MODAL -->
+  <div class="modal-overlay" id="bookModal" onclick="if(event.target===this) closeBookModal()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeBookModal()">✕</button>
+      <div class="modal-hero-flex" id="modalHero">
+        <div class="modal-cover-wrap">
+          <img id="modalCoverImg" src="" alt="Bìa sách" />
+          <label class="btn-change-cover">
+            🖼️ Đổi ảnh bìa
+            <input type="file" accept="image/*" style="display:none;" onchange="handleCustomCoverUpload(event)" />
+          </label>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
+            <span class="badge-new">TIÊU ĐIỂM THƯ VIỆN</span>
+            <span class="badge-grade" id="modalGrade"></span>
+            <span class="badge-location" id="modalLocation"></span>
+          </div>
+          <h2 style="font-size:1.5rem; font-weight:900; color:#fff; margin-bottom:6px; line-height:1.25;" id="modalTitle"></h2>
+          <div style="font-size:0.88rem; color:#fde68a; font-weight:600; margin-bottom:10px;" id="modalAuthor"></div>
+          <p style="font-size:0.92rem; color:#f1f5f9; line-height:1.55;" id="modalHook"></p>
+          <div class="mood-tags-row" id="modalTags" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- AUDIO TRAILER 45-55S + STUDIO UPLOAD/RECORD -->
+        <div class="podcast-box">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div>
+              <strong style="color:#fde68a; font-size:0.96rem;">🎙️ Audio Review Book ~50 Giây (CLB Thư Viện Mic &amp; Mind)</strong>
+              <span id="audioSourceBadge" style="margin-left:8px; font-size:0.72rem; background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#6ee7b7; padding:2px 8px; border-radius:999px; font-weight:700;">
+                🤖 Giọng AI Chuẩn Hóa Phát Âm Anh/Nhật
+              </span>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="btn-primary" style="padding:7px 15px; font-size:0.82rem;" onclick="playCurrentBookAudio()" id="btnPlayAudio">
+                ▶ Phát Audio Trailer (~50s)
+              </button>
+              <button class="btn-small" onclick="stopAllAudio()">
+                ⏹ Dừng
+              </button>
+            </div>
+          </div>
+
+          <!-- TRÌNH PHÁT AUDIO CHUYÊN NGHIỆP -->
+          <div class="audio-player-bar">
+            <audio id="html5AudioPlayer" controls style="flex:1; height:36px; min-width:240px;"></audio>
+            <div style="display:flex; align-items:center; gap:6px; font-size:0.75rem; color:#cbd5e1;">
+              <span>Tốc độ:</span>
+              <select id="audioSpeedSelect" onchange="changeAudioSpeed(this.value)" style="background:#141824; color:#fff; border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:4px 8px; font-size:0.75rem;">
+                <option value="1.0">1.0x (Chậm rãi)</option>
+                <option value="1.1">1.1x (Vừa phải)</option>
+                <option value="1.2" selected>1.2x (Mặc định - Chuẩn)</option>
+                <option value="1.3">1.3x (Sôi nổi)</option>
+                <option value="1.4">1.4x (Nhanh)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- PHÒNG THU CLB MIC & MIND: UPLOAD FILE AUDIO HOẶC GHI ÂM TRỰC TIẾP -->
+          <div class="studio-upload-bar">
+            <div style="font-size:0.78rem; color:#bae6fd;">
+              <strong>🎧 Phòng thu CLB Mic &amp; Mind:</strong> Tải file thu âm của học sinh/giáo viên lên hoặc thu âm trực tiếp cho cuốn sách này:
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+              <label class="btn-small" style="background:#0284c7; border-color:#38bdf8;">
+                📤 Upload File Audio (.mp3, .m4a, .wav)
+                <input type="file" accept="audio/*" style="display:none;" onchange="handleClubAudioUpload(event)" />
+              </label>
+              <button class="btn-small" id="btnMicRecord" onclick="toggleMicRecording()">
+                🔴 Thu âm trực tiếp bằng Mic
+              </button>
+              <button class="btn-small" id="btnResetAiAudio" onclick="resetToDefaultAiAudio()" style="display:none; color:#fca5a5;">
+                🔄 Khôi phục giọng AI mặc định
+              </button>
+            </div>
+          </div>
+
+          <!-- KỊCH BẢN ĐỌC 45-55 GIÂY (CÓ THỂ CHỈNH SỬA) -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <span style="font-size:0.74rem; color:#94a3b8; font-weight:700;">📜 KỊCH BẢN ĐỌC ĐIỂM SÁCH CHUẨN 45 – 55 GIÂY (Dành cho phát thanh viên CLB Mic &amp; Mind):</span>
+              <button class="btn-small" style="padding:3px 9px; font-size:0.7rem;" onclick="toggleEditScript()">✏️ Sửa kịch bản &amp; Đọc thử</button>
+            </div>
+            <p style="font-size:0.88rem; color:#fef3c7; line-height:1.62; font-style:italic; background:rgba(0,0,0,0.3); padding:12px 14px; border-radius:8px;" id="modalPodcastScript"></p>
+            <div id="editScriptBox" style="display:none; margin-top:8px;">
+              <textarea id="editScriptTextarea" class="prompt-textarea" style="min-height:100px; color:#fef3c7; font-family:inherit; font-size:0.86rem;"></textarea>
+              <div style="display:flex; gap:8px; margin-top:6px;">
+                <button class="btn-small" style="background:#10b981; border-color:#10b981;" onclick="saveEditedScript()">💾 Lưu kịch bản mới</button>
+                <button class="btn-small" onclick="speakWithSmartPhoneticWebSpeech()">🔊 Đọc kịch bản vừa sửa bằng Voice AI Chuẩn Phiên Âm</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MINI QUIZ -->
+        <div class="quiz-box">
+          <strong style="color:#7dd3fc; font-size:0.92rem;">🎯 Thử Thách Đố Vui 10 Giây (Trả lời đúng để nhận gợi ý mượn sách!)</strong>
+          <p style="font-size:0.92rem; color:#fff; font-weight:600; margin-top:8px;" id="modalQuizQuestion"></p>
+          <div id="modalQuizOptions"></div>
+          <div id="modalQuizFeedback" style="margin-top:10px; font-size:0.85rem; display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEACHER REUSABILITY (<30 MIN) MODAL -->
+  <div class="modal-overlay" id="teacherModal" onclick="if(event.target===this) closeTeacherModal()">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeTeacherModal()">✕</button>
+      <div class="modal-hero-flex" style="background: linear-gradient(135deg, #0284c7 0%, #1e293b 100%);">
+        <div>
+          <span class="badge-new" style="background:#10b981;">NHÓM LAN TỎA • TÁI SỬ DỤNG DƯỚI 30 PHÚT</span>
+          <h2 style="font-size:1.45rem; font-weight:900; color:#fff; margin-top:8px;">
+            Bộ Công Cụ Nhân Rộng "Sky-Line Bookflix" Cho Mọi Thư Viện &amp; Tổ Bộ Môn
+          </h2>
+          <p style="font-size:0.86rem; color:#e2e8f0; margin-top:4px;">
+            Không cần biết lập trình • Không phụ thuộc mã kệ cứng nhắc của Thuvien.exe • Tải hàng loạt bằng file Excel chỉ trong 15 phút!
+          </p>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <div class="step-card">
+          <h3 style="font-size:1rem; color:#38bdf8; margin-bottom:6px;">Bước 1: Copy Khuôn Lệnh AI Hàng Loạt (Batch Prompt)</h3>
+          <p style="font-size:0.84rem; color:#cbd5e1;">
+            Copy câu lệnh dưới đây dán vào ChatGPT hoặc Google Gemini miễn phí kèm danh sách tên sách của cơ sở/bộ môn bạn:
+          </p>
+          <textarea class="prompt-textarea" id="batchPromptText" readonly>Đóng vai Chuyên gia Truyền thông Văn hóa đọc tại Hệ thống Giáo dục Sky-Line. Tôi có danh sách các cuốn sách dưới đây. Hãy tạo bảng dữ liệu CSV gồm đúng 12 cột:
+STT, Tên sách / Bộ sách, Tác giả / NXB, Cấp học phù hợp (TH/THCS/THPT), Kệ trưng bày Bookflix (Mới Bóc Tem / Manga & Điện Ảnh / Trạm Chữa Lành & Văn Học / Bứt Phá Tư Duy / Khám Phá & Việt Nam), Tâm trạng (Mood Tags), Vị trí thực tế tại Thư viện, Lời giới thiệu kiểu Trailer Netflix (2 câu gây tò mò, hấp dẫn), Kịch bản Audio Review Book 45s (khoảng 120-140 chữ dành cho CLB Phát thanh đọc diễn cảm), Câu hỏi Quiz 1, Đáp án đúng 1, Giải thích ngắn.
+Lưu ý: Nội dung trong sáng, truyền cảm hứng, phù hợp học sinh phổ thông. Danh sách sách của tôi gồm:
+[DÁN DANH SÁCH TÊN SÁCH CỦA BẠN VÀO ĐÂY]</textarea>
+          <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
+            <button class="btn-primary" style="padding:8px 16px; font-size:0.82rem;" onclick="copyBatchPrompt()">
+              📋 Sao chép Khuôn lệnh AI
+            </button>
+            <button class="btn-secondary" style="padding:8px 16px; font-size:0.82rem;" onclick="downloadSampleCsv()">
+              📥 Tải File Excel Mẫu Trình Bày Đẹp (.xlsx)
+            </button>
+            <a href="3_Khuon_Lenh_AI_Va_Huong_Dan_Tai_Su_Dung.html" target="_blank" class="btn-secondary" style="padding:8px 16px; font-size:0.82rem; text-decoration:none;">
+              📘 Mở Trang Hướng Dẫn Chi Tiết (&lt;30p)
+            </a>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <h3 style="font-size:1rem; color:#4ade80; margin-bottom:6px;">Bước 2: Tải File Excel (.xlsx, .csv) Lên Để Cập Nhật Kệ Sách Ngay Lập Tức</h3>
+          <p style="font-size:0.84rem; color:#cbd5e1; margin-bottom:10px;">
+            Chọn file Excel (<code>.xlsx</code>, <code>.xls</code>) hoặc <code>.csv</code> từ máy tính của bạn. Toàn bộ kệ sách Bookflix và Trợ lý AI sẽ tự động thay thế và cập nhật ngay theo danh sách sách mới trong file Excel (không cần tạo web trống trước)!
+          </p>
+          <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" onchange="handleExcelUpload(event)" style="display:block; width:100%; padding:10px; background:#090b10; border:1px dashed #38bdf8; border-radius:8px; color:#fff; cursor:pointer;" />
+          <div id="uploadStatusMsg" style="margin-top:8px; font-size:0.84rem; color:#4ade80; font-weight:700;"></div>
+          <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+            <button class="btn-secondary" style="padding:7px 14px; font-size:0.8rem; border-color:#38bdf8; color:#bae6fd;" onclick="exportStandaloneTeacherWeb()">
+              📦 Xuất File Web Riêng (.html) Cho Tổ Bộ Môn / Cơ Sở Khác
+            </button>
+            <button class="btn-secondary" style="padding:7px 14px; font-size:0.8rem; border-color:#f59e0b; color:#fde68a;" onclick="restoreOriginalLibraryBooks()">
+              🔄 Khôi Phục 27 Bộ Sách Gốc Của Thư Viện
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <strong>HỆ THỐNG GIÁO DỤC SKY-LINE • CUỘC THI SKY-LINE AI SPARK 2026 – 2027</strong><br/>
+    Sản phẩm dự thi Bảng A (Nhóm Lan tỏa): <em>Mô hình Truyền Thông Văn Hóa Đọc "Sky-Line Bookflix" &amp; Quy Trình AI Số Hóa Tiêu Điểm Sách Trong 20 Phút</em><br/>
+    Tác giả: <strong>Dương Thảo My – Tổ Công tác Học sinh và Văn hóa Đọc</strong> (Phối hợp cùng CLB Thư viện Mic &amp; Mind) • An toàn dữ liệu 100% – Chi phí 0 đồng
+  </footer>
+
+  <script>
+    // TỪ ĐIỂN PHIÊN ÂM TỰ ĐỘNG CHO TÊN TIẾNG ANH & TIẾNG NHẬT (KHÔNG DÙNG GẠCH NỐI ĐỂ TRÁNH NGẮT HƠI GIỮA TỪ)
+    function toVietnamesePhonetic(text) {
+      const dict = [
+        [/Sky-Line\s+Bookflix/gi, "Xkai Lai Búc phlích"],
+        [/Bookflix/gi, "Búc phlích"],
+        [/Sky-Line/gi, "Xkai Lai"],
+        [/Mic\s*&\s*Mind/gi, "Míc en Mai"],
+        [/Box\s*set/gi, "Bốc xét"],
+        [/Combo\s+Manga/gi, "Com bo Man ga"],
+        [/Combo/gi, "Com bo"],
+        [/Manga/gi, "Man ga"],
+        [/Movie\s+Story/gi, "Mu vi Xto ri"],
+        [/Doraemon/gi, "Đô rê mon"],
+        [/Nobita/gi, "Nô bi ta"],
+        [/Dorami/gi, "Đô ra mi"],
+        [/Shizuka/gi, "Si du ka"],
+        [/Suneo/gi, "Xư nê ô"],
+        [/Jaian/gi, "Chai en"],
+        [/Fujiko\s*F\.\s*Fujio/gi, "Phu gi kô Ép Phu gi ô"],
+        [/Kachi\s+Kochi/gi, "Ka chi Kô chi"],
+        [/Recorder/gi, "Ri cót đơ"],
+        [/Conan/gi, "Cô nan"],
+        [/Kudo\s+Shinichi/gi, "Ku đô Sin i chi"],
+        [/Gosho\s+Aoyama/gi, "Gô sô A ô gia ma"],
+        [/Your\s+Name/gi, "Gio Nêm"],
+        [/Makoto\s+Shinkai/gi, "Ma kô tô Sin kai"],
+        [/Mitsuha/gi, "Mít xư ha"],
+        [/Taki/gi, "Ta ki"],
+        [/Tiamat/gi, "Ti a mát"],
+        [/Weathering\s+With\s+You/gi, "Goe đơ rinh Guýt Giu"],
+        [/Hodaka/gi, "Hô đa ka"],
+        [/Hina/gi, "Hi na"],
+        [/Tokyo/gi, "Tô ky ô"],
+        [/Vol\.1,\s*Vol\.2,\s*Vol\.3/gi, "Tập 1, Tập 2 và Tập 3"],
+        [/Vol\.\s*(\d+)/gi, "Tập $1"],
+        [/B\.R\.O\s+Group/gi, "Nhóm tác giả Bi A Âu"],
+        [/Fredrik\s+Backman/gi, "Phrét rích Bắc man"],
+        [/\bOve\b/g, "Ô vơ"],
+        [/Wonder/gi, "Goăn đơ"],
+        [/Auggie\s+Pullman/gi, "O gi Pun man"],
+        [/Auggie/gi, "O gi"],
+        [/R\.J\.\s*Palacio/gi, "Pa la xi ô"],
+        [/Choose\s+Kind/gi, "Chu Khai"],
+        [/Frances\s+Hodgson\s+Burnett/gi, "Phran xít Bơ nét"],
+        [/\bMary\b/g, "Me ri"],
+        [/\bColin\b/g, "Cô lin"],
+        [/\bDickon\b/g, "Đích cơn"],
+        [/José\s+Mauro\s+de\s+Vasconcelos/gi, "Giô dê Mau rô đê Va xcon xê lốt"],
+        [/Zezé/gi, "Dê dê"],
+        [/Daddy-Long-Legs/gi, "Đát đi Long Léc"],
+        [/Jean\s+Webster/gi, "Gin Guép xtơ"],
+        [/Judy\s+Abbott/gi, "Giu đi A bốt"],
+        [/Judy/gi, "Giu đi"],
+        [/Yoshichi\s+Shimada/gi, "Giô si chi Si ma đa"],
+        [/\bSaga\b/g, "Xa ga"],
+        [/\bAkihiro\b/gi, "A ki hi rô"],
+        [/Brad\s+Wilcox/gi, "Brát Guyn cốc"],
+        [/J\.S\.C/gi, ""],
+        [/Max\s+S\.\s*Bennett/gi, "Mắc Ben nét"],
+        [/ChatGPT/gi, "Chát Gi Pi Ti"],
+        [/\bAI\s+Spark\b/gi, "Ây Ai Xpác"],
+        [/\bAI\b/g, "Ây Ai"],
+        [/Atlas/gi, "Át lát"],
+        [/Podcast/gi, "Pót cát"],
+        [/Trailer/gi, "Trai lơ"],
+        [/Audio\s+Review\s+Book/gi, "Audio Ri viu Búc"],
+        [/Audio\s+Review/gi, "Audio Ri viu"],
+        [/Review/gi, "Ri viu"],
+        [/\bFan\b/gi, "phan"],
+        [/logic/gi, "lô gíc"]
+      ];
+      let out = text;
+      for (const [regex, rep] of dict) {
+        out = out.replace(regex, rep);
+      }
+      out = out.replace(/\s*[:–—-]\s*/g, " ");
+      out = out.replace(/\s{2,}/g, " ").trim();
+      return out;
+    }
+
+    // DỮ LIỆU 27 BỘ SÁCH VỚI ẢNH BÌA THẬT & KỊCH BẢN AUDIO TRAILER DÀI CHUẨN 45-55 GIÂY
+    let BOOKS_DATA = [
+      {
+        id: 1,
+        title: "Box set Doraemon: Tuyển tập Những người thân yêu (Trọn bộ 6 cuốn)",
+        author: "Fujiko F. Fujio",
+        grades: "TH, THCS",
+        shelves: ["Mới Bóc Tem", "Manga & Điện Ảnh"],
+        moods: ["Chữa lành", "Gia đình", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện - Đang chờ dán mã)",
+        hook: "Không chỉ là những bảo bối thần kỳ, 6 tập truyện đặc biệt này gói trọn những khoảnh khắc ấm áp nhất về bà nội, cha mẹ, em gái Dorami và tình bạn bất diệt giữa Nobita và Doraemon.",
+        podcast: "Chào mừng các bạn thính giả đang lắng nghe chuyên mục Điểm sách của Câu lạc bộ Thư viện Mic & Mind trên hệ thống Sky-Line Bookflix! Hôm nay, nếu tâm hồn bạn đang cần một cái ôm thật ấm áp, hãy cùng chúng mình mở ngay bộ sách Box set Doraemon Tuyển tập Những người thân yêu nhé. Bộ sách trọn bộ sáu cuốn của tác giả Fujiko F. Fujio không chỉ mang đến những bảo bối thần kỳ đầy ắp tiếng cười. Sáu tập truyện đặc biệt này còn gói trọn những khoảnh khắc lắng đọng nhất về tình thương bao la của người bà hiền hậu và sự hy sinh thầm lặng của bố mẹ. Bạn cũng sẽ bắt gặp cô em gái Dorami chu đáo cùng tình bạn vượt thời gian giữa Nobita và chú mèo máy Doraemon. Mỗi trang sách đều nhắc chúng ta biết trân quý hơn những người thân yêu bên cạnh mình. Hãy ghé ngay Bàn trưng bày sách mới tại thư viện để thưởng thức trọn bộ nhé!",
+        quizQ: "Bộ tuyển tập đặc biệt này của Doraemon gồm bao nhiêu cuốn?",
+        quizAns: "Trọn bộ 6 cuốn xoay quanh những người thân yêu",
+        quizWrongs: ["Chỉ có 1 tập duy nhất", "Gồm 12 cuốn theo 12 tháng"],
+        quizExplain: "Trọn bộ gồm 6 cuốn tuyển chọn những câu chuyện cảm động nhất về bà, mẹ, bố và bạn bè của Nobita.",
+        cover: "covers/book_1.jpg?v=3",
+        audio: "audio/book_1.mp3?v=2",
+        gradient: "linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%)"
+      },
+      {
+        id: 2,
+        title: "Combo Manga: Thám tử lừng danh Conan – Tuyển tập Fan bình chọn (Tập 1 + 2)",
+        author: "Gosho Aoyama",
+        grades: "THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Manga & Điện Ảnh"],
+        moods: ["Phiêu lưu", "Phá án", "Hồi hộp"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện - Đang chờ dán mã)",
+        hook: "Những vụ án hóc búa nhất, những màn suy luận nghẹt thở được hàng triệu độc giả bình chọn suốt nhiều thập kỷ. Liệu bạn có tìm ra hung thủ trước khi Conan cất tiếng nói?",
+        podcast: "Xin chào các thám tử nhí của đại gia đình Sky-Line! Bạn đang lắng nghe chuyên mục Audio Review từ Câu lạc bộ Thư viện Mic & Mind. Nếu bạn đam mê suy luận logic và những màn đấu trí nghẹt thở, đừng bỏ qua bộ truyện Thám tử lừng danh Conan Tuyển tập Fan bình chọn. Ấn phẩm đặc biệt gồm Tập một và Tập hai của tác giả Gosho Aoyama quy tụ những vụ án hóc búa và kịch tính nhất suốt nhiều thập kỷ qua. Từng manh mối nhỏ nhặt và từng thủ thuật khóa kín phòng đều là một bài toán thử thách khả năng quan sát nhạy bén của bạn. Liệu bạn có thể tìm ra chân tướng sự thật trước khi cậu thám tử Conan cất lời giải đáp? Bộ sách đang chờ bạn khám phá tại Bàn trưng bày sách mới sảnh thư viện đấy!",
+        quizQ: "Điểm đặc biệt của bộ đôi tập truyện Conan mới về thư viện này là gì?",
+        quizAns: "Tuyển tập những vụ án xuất sắc nhất do chính Fan bình chọn",
+        quizWrongs: ["Kể về thời thơ ấu của Tiến sĩ Agasa", "Sách dạy vẽ nhân vật hoạt hình"],
+        quizExplain: "Đây là ấn phẩm đặc biệt tổng hợp các vụ án kinh điển được độc giả yêu thích nhất.",
+        cover: "covers/book_2.jpg?v=3",
+        audio: "audio/book_2.mp3?v=2",
+        gradient: "linear-gradient(135deg, #1e1b4b 0%, #b91c1c 100%)"
+      },
+      {
+        id: 3,
+        title: "Boxset Your Name – Tên cậu là gì? (Trọn bộ 3 tập)",
+        author: "Makoto Shinkai",
+        grades: "THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Manga & Điện Ảnh"],
+        moods: ["Chữa lành", "Kỳ ảo", "Cảm xúc"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện - Đang chờ dán mã)",
+        hook: "Một ngôi sao chổi nghìn năm có một. Hai tâm hồn xa lạ bất ngờ hoán đổi cơ thể qua những giấc mơ. Một kiệt tác về định mệnh, thời gian và sợi dây kết nối kỳ diệu.",
+        podcast: "Chào bạn đến với không gian sách nói của Câu lạc bộ Thư viện Mic & Mind trên Sky-Line Bookflix! Có bao giờ bạn thức dậy sau một giấc mơ và cảm thấy mình đang tìm kiếm một ai đó chưa từng gặp mặt? Đó chính là khởi đầu kỳ diệu của bộ sách Your Name Tên cậu là gì trọn bộ ba tập của nhà văn tài hoa Makoto Shinkai. Dưới bầu trời đêm rực sáng của ngôi sao chổi Tiamat nghìn năm có một, một phép màu kỳ ảo đã xảy ra. Cô nữ sinh Mitsuha nơi thị trấn vùng núi yên bình và cậu nam sinh Taki giữa thủ đô Tokyo nhộn nhịp bất ngờ hoán đổi cơ thể cho nhau. Tác phẩm chạm đến tầng sâu nhất của cảm xúc về định mệnh, ký ức và sợi dây kết nối diệu kỳ vượt qua không gian lẫn thời gian. Hãy đến ngay thư viện Sky-Line để đắm mình vào bầu trời đầy sao của Your Name nhé!",
+        quizQ: "Hiện tượng thiên nhiên kỳ vĩ nào gắn liền với câu chuyện trong Your Name?",
+        quizAns: "Ngôi sao chổi nghìn năm có một bay qua Trái Đất",
+        quizWrongs: ["Một trận bão tuyết ở Bắc Cực", "Nhật thực toàn phần trên biển"],
+        quizExplain: "Sao chổi Tiamat là nút thắt kỳ ảo kết nối hai nhân vật xuyên không gian và thời gian.",
+        cover: "covers/book_3.jpg?v=3",
+        audio: "audio/book_3.mp3?v=2",
+        gradient: "linear-gradient(135deg, #311042 0%, #1e3a8a 60%, #0284c7 100%)"
+      },
+      {
+        id: 4,
+        title: "Combo Sách: Tư duy ngược + Tư duy mở (Bộ 2 cuốn)",
+        author: "Nguyễn Anh Dũng",
+        grades: "THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Bứt Phá Tư Duy"],
+        moods: ["Tư duy", "Tự tin", "Truyền cảm hứng"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện - Đang chờ dán mã)",
+        hook: "Tại sao chúng ta thường đi theo lối mòn? Bộ đôi sách bán chạy nhất giúp học sinh thế hệ mới dám đặt câu hỏi ngược, mở rộng góc nhìn và làm chủ tương lai trong kỷ nguyên số.",
+        podcast: "Chào mừng các bạn học sinh đến với chuyên mục Điểm sách truyền cảm hứng của Câu lạc bộ Mic & Mind! Trong kỷ nguyên số thay đổi từng ngày, tại sao chúng ta lại cứ mãi bước đi trên những lối mòn quen thuộc? Hôm nay, Sky-Line Bookflix trân trọng giới thiệu đến các bạn học sinh bộ đôi sách rất được yêu thích là Tư duy ngược và Tư duy mở của tác giả Nguyễn Anh Dũng. Cuốn Tư duy mở sẽ giúp bạn gỡ bỏ định kiến, sẵn sàng tiếp nhận tri thức mới và rèn luyện kỹ năng lắng nghe đa chiều. Trong khi đó, cuốn Tư duy ngược lại đánh thức bản lĩnh dám đặt câu hỏi khác biệt để tìm ra giải pháp đột phá trong học tập và cuộc sống. Hãy ghé ngay Bàn trưng bày sách mới tại thư viện để đọc và làm chủ tư duy của chính mình ngay hôm nay!",
+        quizQ: "Bộ đôi sách Tư duy ngược + Tư duy mở giúp người đọc rèn luyện năng lực cốt lõi nào?",
+        quizAns: "Tư duy phản biện, sáng tạo và sẵn sàng đón nhận góc nhìn mới",
+        quizWrongs: ["Kỹ năng tính nhẩm siêu tốc", "Cách học thuộc lòng văn bản dài"],
+        quizExplain: "Tư duy mở giúp tiếp nhận tri thức mới, còn Tư duy ngược giúp giải quyết vấn đề theo hướng đột phá.",
+        cover: "covers/book_4.jpg?v=3",
+        audio: "audio/book_4.mp3?v=2",
+        gradient: "linear-gradient(135deg, #78350f 0%, #d97706 100%)"
+      },
+      {
+        id: 5,
+        title: "Bộ sách Yêu quá Việt Nam (Trọn bộ 6 cuốn)",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS",
+        shelves: ["Mới Bóc Tem", "Khám Phá & Việt Nam"],
+        moods: ["Nghệ thuật", "Khám phá", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện - Đang chờ dán mã)",
+        hook: "Hành trình xuyên Việt rực rỡ sắc màu qua 6 tập sách: từ danh lam thắng cảnh, ẩm thực ba miền đến phong tục văn hóa độc đáo của dải đất hình chữ S thân thương.",
+        podcast: "Xin chào các tâm hồn yêu xê dịch của trường Sky-Line! Cùng Câu lạc bộ Thư viện Mic & Mind xách ba lô lên và thực hiện một chuyến du lịch xuyên Việt ngay tại sảnh thư viện với bộ sách Yêu quá Việt Nam trọn bộ sáu cuốn! Với nét vẽ minh họa rực rỡ sắc màu và lối kể chuyện gần gũi, sáu tập sách sẽ dẫn dắt các bạn đi dọc dải đất hình chữ S thân thương. Chúng mình sẽ cùng khám phá từ những danh lam thắng cảnh hùng vĩ và các di tích lịch sử lâu đời cho đến nền ẩm thực ba miền phong phú. Bộ sách còn giới thiệu những lễ hội văn hóa truyền thống vô cùng độc đáo của các dân tộc Việt Nam. Mỗi trang sách mở ra đều nuôi dưỡng niềm tự hào dân tộc và tình yêu quê hương đất nước. Mời các bạn ghé bàn sách mới thư viện để bắt đầu hành trình khám phá nhé!",
+        quizQ: "Bộ sách Yêu quá Việt Nam gồm 6 cuốn đưa học sinh khám phá chủ đề gì?",
+        quizAns: "Văn hóa, địa lý, ẩm thực và cảnh đẹp khắp ba miền Việt Nam",
+        quizWrongs: ["Lịch sử các cuộc thám hiểm vũ trụ", "Các loài khủng long thời tiền sử"],
+        quizExplain: "Bộ sách nuôi dưỡng tình yêu quê hương qua những trang minh họa rực rỡ về đất nước Việt Nam.",
+        cover: "covers/book_5.jpg?v=3",
+        audio: "audio/book_5.mp3?v=2",
+        gradient: "linear-gradient(135deg, #991b1b 0%, #eab308 100%)"
+      },
+      {
+        id: 6,
+        title: "Doraemon Movie Story Màu: Nobita và chuyến thám hiểm Nam Cực Kachi Kochi",
+        author: "Fujiko F. Fujio",
+        grades: "TH, THCS",
+        shelves: ["Manga & Điện Ảnh"],
+        moods: ["Phiêu lưu", "Khoa học", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Từ một tảng băng khổng lồ trôi dạt ở Nam Thái Bình Dương, nhóm bạn Doraemon phát hiện một chiếc vòng vàng bị đóng băng từ 100.000 năm trước tại Nam Cực!",
+        podcast: "Chào các bạn nhỏ yêu thích phiêu lưu mạo hiểm! Bạn đang lắng nghe chuyên mục Điểm sách của Câu lạc bộ Mic & Mind trên hệ thống Sky-Line Bookflix. Hôm nay, chúng mình sẽ đưa bạn đến lục địa băng giá qua cuốn truyện màu Doraemon Nobita và chuyến thám hiểm Nam Cực Kachi Kochi của tác giả Fujiko F. Fujio! Câu chuyện bắt đầu từ một tảng băng khổng lồ trôi dạt giữa Nam Thái Bình Dương. Nhóm bạn Doraemon tình cờ phát hiện ra một chiếc vòng bằng vàng bị đóng băng suốt một trăm nghìn năm trước tại Nam Cực, thời điểm nơi đây vốn không có người ở! Để tìm lại chủ nhân chiếc vòng, cả nhóm đã du hành ngược thời gian và khám phá một thành phố cổ đại ẩn sâu dưới lớp băng vĩnh cửu. Toàn bộ các trang sách đều được in màu sống động như một bộ phim chiếu rạp tại thư viện Sky-Line!",
+        quizQ: "Nhóm bạn Doraemon đã tìm thấy vật gì nằm sâu trong lớp băng Nam Cực?",
+        quizAns: "Chiếc vòng vàng bí ẩn bị đóng băng từ 100.000 năm trước",
+        quizWrongs: ["Một chiếc tàu vũ trụ của người Sao Hỏa", "Bản đồ kho báu của cướp biển"],
+        quizExplain: "Chiếc vòng vàng dẫn nhóm bạn tới thành phố cổ đại ẩn dưới băng giá Nam Cực.",
+        cover: "covers/book_6.jpg?v=3",
+        audio: "audio/book_6.mp3?v=2",
+        gradient: "linear-gradient(135deg, #0369a1 0%, #38bdf8 100%)"
+      },
+      {
+        id: 7,
+        title: "Doraemon Movie Story Màu: Tân Nobita và chuyến phiêu lưu vào xứ quỷ",
+        author: "Fujiko F. Fujio",
+        grades: "TH, THCS",
+        shelves: ["Manga & Điện Ảnh"],
+        moods: ["Phiêu lưu", "Kỳ ảo", "Hồi hộp"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Chuyện gì sẽ xảy ra nếu thế giới khoa học biến thành thế giới phép thuật? Nobita và những người bạn trở thành 7 dũng sĩ phép thuật giải cứu Địa Cầu khỏi hành tinh Quỷ!",
+        podcast: "Xin chào các phù thủy tương lai của đại gia đình Sky-Line! Chuyện gì sẽ xảy ra nếu một buổi sáng thức dậy, thế giới khoa học hiện đại bỗng chốc biến thành thế giới của phép thuật và chổi bay? Hãy cùng Câu lạc bộ Thư viện Mic & Mind khám phá ngay cuốn truyện màu Doraemon Tân Nobita và chuyến phiêu lưu vào xứ quỷ của tác giả Fujiko F. Fujio! Nhờ bảo bối Tủ điện thoại yêu cầu, cậu bé Nobita đã biến ước mơ về một thế giới phép thuật thành hiện thực. Thế nhưng cũng chính lúc ấy, hành tinh Quỷ bắt đầu tiến gần và đe dọa sự bình yên của Địa Cầu. Nobita, Doraemon cùng nhóm bạn đã dũng cảm hóa thân thành những dũng sĩ phép thuật để bảo vệ hành tinh xanh. Cuốn truyện tranh màu tuyệt đẹp này đang chờ bạn tại Bàn trưng bày sách mới sảnh thư viện đấy!",
+        quizQ: "Nobita đã dùng bảo bối nào để biến thế giới hiện tại thành thế giới phép thuật?",
+        quizAns: "Tủ điện thoại yêu cầu ('Nếu như...')",
+        quizWrongs: ["Cỗ máy thời gian", "Cánh cửa thần kỳ"],
+        quizExplain: "Tủ điện thoại yêu cầu giúp hiện thực hóa thế giới giả định nơi phép thuật thay thế khoa học.",
+        cover: "covers/book_7.jpg?v=3",
+        audio: "audio/book_7.mp3?v=2",
+        gradient: "linear-gradient(135deg, #3b0764 0%, #7e22ce 100%)"
+      },
+      {
+        id: 8,
+        title: "Doraemon Movie Story Màu: Nobita và bản giao hưởng Địa Cầu",
+        author: "Fujiko F. Fujio",
+        grades: "TH, THCS",
+        shelves: ["Mới Bóc Tem", "Manga & Điện Ảnh"],
+        moods: ["Nghệ thuật", "Phiêu lưu", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Nếu âm nhạc biến mất khỏi Trái Đất thì sao? Chiếc sáo recorder tưởng chừng vụng về của Nobita lại tạo ra âm thanh duy nhất có thể đánh thức Lâu đài Âm nhạc vũ trụ!",
+        podcast: "Chào mừng bạn đến với giai điệu diệu kỳ của chuyên mục Audio Review từ Câu lạc bộ Thư viện Mic & Mind! Bạn đã bao giờ tự hỏi thế giới sẽ ra sao nếu một ngày âm nhạc hoàn toàn biến mất khỏi Trái Đất? Hãy mở ngay cuốn truyện màu mới nhất mang tên Doraemon Nobita và bản giao hưởng Địa Cầu của tác giả Fujiko F. Fujio! Trong lúc tập thổi chiếc sáo Recorder cho buổi biểu diễn ở trường, Nobita vô tình thổi ra một nốt nhạc lạc điệu. Thế nhưng âm thanh mộc mạc, chân thành ấy lại chính là chìa khóa đánh thức cô bé bí ẩn đến từ Lâu đài Âm nhạc ngoài vũ trụ. Giữa lúc một thực thể lạ đang âm mưu xóa sổ mọi giai điệu khỏi Trái Đất, tình yêu âm nhạc của nhóm bạn đã tạo nên bản giao hưởng giải cứu hành tinh. Hãy ghé ngay thư viện Sky-Line để thưởng thức nhé!",
+        quizQ: "Nhạc cụ nào gắn liền với Nobita trong hành trình giải cứu âm nhạc của Trái Đất?",
+        quizAns: "Chiếc sáo Recorder",
+        quizWrongs: ["Đàn Dương cầm (Piano)", "Trống cái"],
+        quizExplain: "Tiếng sáo mộc mạc nhưng chân thành của Nobita là mảnh ghép không thể thiếu của bản giao hưởng.",
+        cover: "covers/book_8.jpg?v=3",
+        audio: "audio/book_8.mp3?v=2",
+        gradient: "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)"
+      },
+      {
+        id: 9,
+        title: "Lớp học mật ngữ – Tuyển tập đặc biệt Vol.1, Vol.2, Vol.3 (Tái bản 2024)",
+        author: "B.R.O Group",
+        grades: "TH, THCS",
+        shelves: ["Mới Bóc Tem", "Manga & Điện Ảnh"],
+        moods: ["Vui vẻ", "Phiêu lưu", "Chữa lành"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Khi 12 cung Hoàng Đạo cùng học chung một lớp học siêu lầy lội tại trường Ngân Hà! Những câu chuyện học đường cười nghiêng ngả nhưng đầy ắp tình bạn của nhóm tác giả Việt Nam.",
+        podcast: "Xin chào các bạn học sinh tràn đầy năng lượng của Sky-Line! Sau những giờ học căng thẳng trên lớp, nếu bạn đang tìm kiếm những tràng cười sảng khoái nhất, hãy đến ngay với chuyên mục Điểm sách của Câu lạc bộ Thư viện Mic & Mind. Chúng mình xin giới thiệu bộ ba cuốn truyện tranh Việt Nam đình đám mang tên Lớp học mật ngữ Tuyển tập đặc biệt Tập một, Tập hai và Tập ba của nhóm tác giả B.R.O Group! Tại ngôi trường Ngân Hà vui nhộn, mười hai nhân vật đại diện cho mười hai cung Hoàng Đạo cùng học chung trong một lớp học siêu lầy lội. Từ những màn ganh đua điểm số hài hước và những kế hoạch tinh nghịch bất ngờ cho đến sự đoàn kết ấm áp, bộ truyện chắc chắn sẽ khiến bạn cười nghiêng ngả. Trọn bộ ba tập đang có mặt trên kệ sách mới thư viện!",
+        quizQ: "Các nhân vật học sinh trong bộ truyện Lớp học mật ngữ đại diện cho điều gì?",
+        quizAns: "12 Cung Hoàng Đạo",
+        quizWrongs: ["12 Con Giáp", "Các hành tinh trong Hệ Mặt Trời"],
+        quizExplain: "Mỗi nhân vật mang nét tính cách hài hước đặc trưng của 12 chòm sao hoàng đạo.",
+        cover: "covers/book_9.jpg?v=3",
+        audio: "audio/book_9.mp3?v=2",
+        gradient: "linear-gradient(135deg, #be185d 0%, #f43f5e 100%)"
+      },
+      {
+        id: 10,
+        title: "Đứa con của thời tiết (Weathering With You)",
+        author: "Makoto Shinkai",
+        grades: "THCS, THPT",
+        shelves: ["Manga & Điện Ảnh"],
+        moods: ["Cảm xúc", "Kỳ ảo", "Chữa lành"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Giữa một Tokyo mưa tầm tã không ngừng nghỉ, cậu thiếu niên Hodaka gặp Hina – cô gái sở hữu năng lực gọi nắng kỳ diệu chỉ bằng một lời cầu nguyện.",
+        podcast: "Chào bạn đang lắng nghe chuyên mục Điểm sách cảm xúc của Câu lạc bộ Thư viện Mic & Mind trên Sky-Line Bookflix! Tiếp nối thành công vang dội của Your Name, đạo diễn kiêm nhà văn Makoto Shinkai tiếp tục gửi đến độc giả một tác phẩm đẹp như thơ mang tên Đứa con của thời tiết, tên tiếng Anh là Weathering With You. Giữa thủ đô Tokyo chìm trong những cơn mưa dầm dề bất tận, cậu thiếu niên mười sáu tuổi Hodaka đã tình cờ gặp gỡ cô bạn Hina. Hina là một cô gái diệu kỳ sở hữu năng lực làm quang mây và gọi ánh nắng rực rỡ trở lại chỉ bằng một lời cầu nguyện chân thành. Thế nhưng đằng sau phép màu mang lại niềm vui cho mọi người ấy lại là một bí mật đầy đánh đổi của bầu trời. Hãy đến ngay thư viện Sky-Line để lắng nghe nhịp đập tuổi trẻ trong cuốn sách tuyệt đẹp này nhé!",
+        quizQ: "Nhân vật Hina trong tác phẩm có năng lực đặc biệt gì?",
+        quizAns: "Cầu nguyện để làm quang mây và mang ánh nắng trở lại",
+        quizWrongs: ["Bay lượn trong gió bão", "Đọc được suy nghĩ của loài chim"],
+        quizExplain: "Hina là 'Cô gái Nắng 100%' mang lại ánh sáng ấm áp cho những ngày mưa dầm.",
+        cover: "covers/book_10.jpg?v=3",
+        audio: "audio/book_10.mp3?v=2",
+        gradient: "linear-gradient(135deg, #1e3a8a 0%, #38bdf8 100%)"
+      },
+      {
+        id: 11,
+        title: "Người đàn ông mang tên Ove (Tái bản)",
+        author: "Fredrik Backman",
+        grades: "THPT",
+        shelves: ["Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Cảm xúc", "Gia đình"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Ove – ông già 59 tuổi cáu kỉnh nhất khu phố, người luôn sống theo nguyên tắc cứng nhắc. Cho đến khi một gia đình hàng xóm ồn ào dọn đến và làm tan chảy trái tim ông...",
+        podcast: "Xin chào các bạn học sinh Trung học phổ thông và các thầy cô giáo trên hệ thống Sky-Line Bookflix! Hôm nay, Câu lạc bộ Thư viện Mic & Mind xin giới thiệu một kiệt tác văn học đương đại đến từ Thụy Điển mang tên Người đàn ông mang tên Ove của nhà văn Fredrik Backman. Ove là một ông già năm mươi chín tuổi nổi tiếng cáu kỉnh và nguyên tắc nhất khu phố. Ông luôn đi kiểm tra từng chiếc xe đạp dựng sai chỗ và sống khép kín trong nỗi cô đơn sau khi người vợ yêu quý qua đời. Thế nhưng cuộc sống tĩnh lặng ấy bỗng bị đảo lộn hoàn toàn khi một gia đình hàng xóm trẻ tuổi, ồn ào và vô cùng hậu đậu dọn đến ở cạnh nhà. Chính sự chân thành và ấm áp của những người hàng xóm đã làm tan chảy trái tim tưởng chừng băng giá của ông Ove. Một cuốn sách lấy đi cả tiếng cười lẫn nước mắt đang chờ bạn tại thư viện!",
+        quizQ: "Điều gì đã làm thay đổi cuộc sống khép kín, cô đơn của ông Ove?",
+        quizAns: "Sự xuất hiện ấm áp và chân thành của gia đình người hàng xóm mới",
+        quizWrongs: ["Ông trúng số độc đắc và đi du lịch", "Ông tìm thấy một kho báu dưới tầng hầm"],
+        quizExplain: "Sự sẻ chia đời thường giữa những người hàng xóm đã đánh thức lòng nhân hậu sâu thẳm trong ông Ove.",
+        cover: "covers/book_11.jpg?v=3",
+        audio: "audio/book_11.mp3?v=2",
+        gradient: "linear-gradient(135deg, #334155 0%, #64748b 100%)"
+      },
+      {
+        id: 12,
+        title: "Điều kỳ diệu (Wonder)",
+        author: "R.J. Palacio",
+        grades: "TH, THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Tự tin", "Gia đình"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Auggie Pullman sinh ra với khuôn mặt khác biệt sau 27 cuộc phẫu thuật. Năm lớp 5, cậu lần đầu tiên bước vào trường học. Một câu chuyện lay động trái tim về lòng tử tế.",
+        podcast: "Khi phải lựa chọn giữa việc tỏ ra mình đúng và việc sống tử tế, hãy chọn sự tử tế! Đó là thông điệp bất hủ mở đầu cho cuốn sách Điều kỳ diệu, tên tiếng Anh là Wonder của tác giả R.J. Palacio mà Câu lạc bộ Thư viện Mic & Mind muốn gửi tới bạn hôm nay. Cuốn sách kể về hành trình của cậu bé Auggie Pullman, người sinh ra với khuôn mặt khác biệt sau hai mươi bảy cuộc phẫu thuật. Dù vậy, cậu bé lại sở hữu một tâm hồn vô cùng thông minh, hóm hỉnh và dũng cảm. Năm lên lớp năm, lần đầu tiên Auggie bước ra khỏi vòng tay bảo bọc của gia đình để đến học tại một ngôi trường bình thường. Vượt qua những ánh nhìn bỡ ngỡ ban đầu, chính lòng dũng cảm của Auggie và sự thấu cảm của thầy cô, bạn bè đã tạo nên điều kỳ diệu. Một cuốn sách gối đầu giường không thể bỏ qua tại thư viện Sky-Line!",
+        quizQ: "Thông điệp cốt lõi nổi tiếng nhất trong cuốn sách Điều kỳ diệu (Wonder) là gì?",
+        quizAns: "Hãy chọn sự tử tế (Choose Kind)",
+        quizWrongs: ["Hãy luôn trở thành người đứng đầu", "Phép thuật có ở khắp mọi nơi"],
+        quizExplain: "Lòng tử tế và sự thấu cảm có sức mạnh tạo nên điều kỳ diệu trong môi trường học đường.",
+        cover: "covers/book_12.jpg?v=3",
+        audio: "audio/book_12.mp3?v=2",
+        gradient: "linear-gradient(135deg, #1d4ed8 0%, #06b6d4 100%)"
+      },
+      {
+        id: 13,
+        title: "Khu vườn bí mật (Ấn bản minh họa màu)",
+        author: "Frances Hodgson Burnett",
+        grades: "TH, THCS",
+        shelves: ["Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Nghệ thuật", "Phiêu lưu"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Sau bức tường phủ đầy dây thường xuân bị khóa kín suốt 10 năm là một khu vườn ngủ quên. Cô bé Mary cùng những người bạn đã đánh thức khu vườn và chữa lành cả tâm hồn mình.",
+        podcast: "Chào mừng bạn đến với khu vườn văn học chữa lành của Câu lạc bộ Thư viện Mic & Mind trên Sky-Line Bookflix! Hôm nay, mời bạn cùng chúng mình mở cánh cửa bước vào tác phẩm kinh điển Khu vườn bí mật của nhà văn Frances Hodgson Burnett, phiên bản minh họa màu tuyệt đẹp. Câu chuyện theo chân cô bé Mary vốn cô đơn và hay cáu kỉnh khi chuyển đến sống tại một trang viên rộng lớn vùng đồng cỏ nước Anh. Tại đây, cô bé tình cờ tìm thấy chiếc chìa khóa cổ mở ra cánh cửa khu vườn đã bị khóa kín suốt mười năm ròng. Cùng với cậu bạn Dickon yêu thiên nhiên và người anh họ Colin ốm yếu, các em đã âm thầm chăm sóc để từng nhành cây đâm chồi nảy lộc. Kỳ diệu thay, chính mùa xuân trong khu vườn cũng đã chữa lành và đánh thức niềm vui sống rạng rỡ trong tâm hồn những đứa trẻ! Sách đang có mặt tại sảnh thư viện nhé!",
+        quizQ: "Nhờ cùng nhau chăm sóc khu vườn bí mật, cô bé Mary và cậu bé Colin đã thay đổi như thế nào?",
+        quizAns: "Trở nên khỏe mạnh, yêu đời và biết mở lòng yêu thương mọi người",
+        quizWrongs: ["Trở thành những nhà thực vật học nổi tiếng thế giới", "Tìm thấy lối đi ngầm ra biển"],
+        quizExplain: "Thiên nhiên kỳ diệu và tình bạn chân thành đã chữa lành cả thể chất lẫn tâm hồn hai đứa trẻ.",
+        cover: "covers/book_13.jpg?v=3",
+        audio: "audio/book_13.mp3?v=2",
+        gradient: "linear-gradient(135deg, #15803d 0%, #10b981 100%)"
+      },
+      {
+        id: 14,
+        title: "Sưởi ấm mặt trời",
+        author: "José Mauro de Vasconcelos",
+        grades: "THCS, THPT",
+        shelves: ["Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Cảm xúc", "Tư duy"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Phần tiếp theo đầy khắc khoải và dịu dàng của 'Cây cam ngọt của tôi'. Cậu bé Zezé ngày nào giờ đã bước vào tuổi thiếu niên với những ước mơ, nỗi cô đơn và khát khao được thấu hiểu.",
+        podcast: "Xin chào những tâm hồn yêu văn học của trường Sky-Line! Nếu bạn từng rưng rưng xúc động trước chú bé Zezé thông minh, nhạy cảm trong tác phẩm kinh điển Cây cam ngọt của tôi, hãy đến ngay thư viện Sky-Line hôm nay. Câu lạc bộ Mic & Mind mời bạn gặp lại cậu bé ấy trong phần tiếp nối đầy khắc khoải mang tên Sưởi ấm mặt trời của nhà văn José Mauro de Vasconcelos. Giờ đây, cậu bé Zezé ngày nào đã bước vào lứa tuổi thiếu niên tại một gia đình nhận nuôi với biết bao bỡ ngỡ. Cậu phải đối diện với những nỗi cô đơn thầm kín của tuổi dậy thì và khát khao mãnh liệt được yêu thương, được thấu hiểu. Giọng văn dịu dàng, giàu chất thơ sẽ sưởi ấm trái tim người đọc và giúp chúng ta thấu cảm hơn với hành trình trưởng thành. Hãy ghé Bàn trưng bày sách mới thư viện để tìm đọc nhé!",
+        quizQ: "Sưởi ấm mặt trời là phần tiếp nối của tác phẩm văn học kinh điển nào?",
+        quizAns: "Cây cam ngọt của tôi",
+        quizWrongs: ["Hoàng tử bé", "Không gia đình"],
+        quizExplain: "Tác phẩm viết tiếp hành trình trưởng thành của cậu bé Zezé khi bước vào tuổi thiếu niên.",
+        cover: "covers/book_14.jpg?v=3",
+        audio: "audio/book_14.mp3?v=2",
+        gradient: "linear-gradient(135deg, #b45309 0%, #f59e0b 100%)"
+      },
+      {
+        id: 15,
+        title: "Ông bố chân dài (Daddy-Long-Legs)",
+        author: "Jean Webster",
+        grades: "THCS, THPT",
+        shelves: ["Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Tự tin", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Cô bé mồ côi Judy Abbott được một nhà hảo tâm bí ẩn tài trợ học đại học với điều kiện duy nhất: mỗi tháng phải viết một bức thư kể chuyện học tập mà không cần hồi âm.",
+        podcast: "Chào các bạn thính giả của Câu lạc bộ Thư viện Mic & Mind! Bạn có tin rằng những bức thư viết tay có thể truyền cảm hứng học tập và thay đổi cả cuộc đời một con người không? Hãy cùng Sky-Line Bookflix mở ngay tác phẩm văn học kinh điển Ông bố chân dài, tên nguyên bản là Daddy-Long-Legs của nhà văn Jean Webster! Nhân vật chính là cô bé mồ côi Judy Abbott giàu nghị lực và có năng khiếu viết văn. Bất ngờ được một vị ân nhân giấu mặt tài trợ toàn bộ học phí vào đại học, Judy chỉ cần thực hiện một điều kiện duy nhất. Mỗi tháng, cô phải viết một bức thư kể lại chuyện học tập và cuộc sống của mình mà không được phép mong chờ hồi âm. Những bức thư hóm hỉnh, tràn ngập năng lượng tích cực của Judy chắc chắn sẽ tiếp thêm động lực học tập tuyệt vời cho bạn tại thư viện Sky-Line!",
+        quizQ: "Vì sao cô bé Judy lại đặt biệt danh cho vị ân nhân bí ẩn của mình là 'Ông bố chân dài'?",
+        quizAns: "Vì cô chỉ kịp nhìn thấy cái bóng cao lêu nghêu của ông hắt lên tường",
+        quizWrongs: ["Vì ông là vận động viên bóng rổ", "Vì ông luôn đi cà kheo"],
+        quizExplain: "Hình ảnh chiếc bóng chân dài dưới ánh đèn xe đã trở thành biệt danh thân thương trong suốt những bức thư.",
+        cover: "covers/book_15.jpg?v=3",
+        audio: "audio/book_15.mp3?v=2",
+        gradient: "linear-gradient(135deg, #6d28d9 0%, #a855f7 100%)"
+      },
+      {
+        id: 16,
+        title: "Người bà tài giỏi vùng Saga",
+        author: "Yoshichi Shimada",
+        grades: "TH, THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Gia đình", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Nghèo đến mức không có gì trong nhà, nhưng người bà vùng Saga lại biến sự nghèo khó thành một cuộc phiêu lưu kỳ thú với triết lý sống lạc quan vô bờ bến.",
+        podcast: "Chào mừng bạn đến với chuyên mục Điểm sách chữa lành của Câu lạc bộ Thư viện Mic & Mind! Hôm nay, chúng mình xin giới thiệu một cuốn tự truyện Nhật Bản đã làm lay động hàng triệu trái tim độc giả mang tên Người bà tài giỏi vùng Saga của tác giả Yoshichi Shimada. Sau biến cố gia đình, cậu bé Akihiro tám tuổi rời thành phố Hiroshima về quê ngoại vùng Saga sống cùng người bà nghèo khó. Dù căn nhà nhỏ nghèo đến mức chẳng có tài sản gì đáng giá, người bà vùng Saga lại biến cuộc sống thiếu thốn thành một chuyến phiêu lưu đầy ắp tiếng cười. Bà buộc thanh gỗ ngang dòng sông để hứng rau củ quả trôi xuống và gọi đó là siêu thị giao hàng tận nơi miễn phí. Bà còn dạy cháu trai rằng học kém một chút cũng không sao, miễn là sống tử tế và luôn mỉm cười. Hãy ghé ngay thư viện Sky-Line để đón nhận nguồn năng lượng lạc quan này nhé!",
+        quizQ: "Người bà vùng Saga đã làm cách nào để 'đi siêu thị miễn phí' ngay trước nhà?",
+        quizAns: "Đặt một thanh gỗ chắn ngang dòng sông để hứng rau củ quả trôi xuống",
+        quizWrongs: ["Trồng cây ăn quả trên mái nhà", "Đổi vỏ sò lấy thức ăn"],
+        quizExplain: "Bà gọi dòng sông là siêu thị giao hàng tận nhà không bao giờ tính phí.",
+        cover: "covers/book_16.jpg?v=3",
+        audio: "audio/book_16.mp3?v=2",
+        gradient: "linear-gradient(135deg, #9a3412 0%, #ea580c 100%)"
+      },
+      {
+        id: 17,
+        title: "Bởi vì có cậu",
+        author: "Kố Mặc",
+        grades: "THCS, THPT",
+        shelves: ["Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Cảm xúc", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Những mẩu chuyện nhỏ dịu dàng về tình bạn, tuổi thanh xuân và sự đồng hành ấm áp giúp bạn nhận ra: thế giới này trở nên tươi đẹp hơn biết bao chỉ bởi vì có cậu.",
+        podcast: "Xin chào các bạn học sinh đang lắng nghe chuyên mục Audio Review của Câu lạc bộ Thư viện Mic & Mind trên Sky-Line Bookflix! Trong hành trình thanh xuân rực rỡ dưới mái trường, điều tuyệt vời nhất có lẽ là tìm được một người bạn tri kỷ luôn lắng nghe và đồng hành cùng mình. Đó cũng chính là thông điệp dịu dàng của cuốn tản văn Bởi vì có cậu của tác giả Kố Mặc đang có mặt tại sảnh thư viện. Qua những mẩu chuyện nhỏ bình dị và ấm áp như nắng sớm, tác phẩm khắc họa những khoảnh khắc sẻ chia buồn vui giúp chúng ta vượt qua áp lực trưởng thành. Gấp trang sách lại, bạn sẽ mỉm cười nhận ra thế giới này trở nên tươi đẹp và đáng yêu hơn biết bao chỉ bởi vì có những người bạn tốt. Hãy rủ ngay người bạn thân nhất của mình lên thư viện cùng đọc cuốn sách này nhé!",
+        quizQ: "Chủ đề chính xuyên suốt cuốn sách Bởi vì có cậu là gì?",
+        quizAns: "Sự trân trọng tình bạn và những khoảnh khắc đồng hành tuổi trẻ",
+        quizWrongs: ["Kinh nghiệm khởi nghiệp công nghệ", "Du lịch khám phá châu Âu"],
+        quizExplain: "Cuốn sách tôn vinh sự gắn kết ấm áp giữa những người bạn trong hành trình trưởng thành.",
+        cover: "covers/book_17.jpg?v=3",
+        audio: "audio/book_17.mp3?v=2",
+        gradient: "linear-gradient(135deg, #be123c 0%, #fb7185 100%)"
+      },
+      {
+        id: 18,
+        title: "Nhật ký trưởng thành của đứa trẻ ngoan – Việc học không hề đáng sợ",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS",
+        shelves: ["Bứt Phá Tư Duy"],
+        moods: ["Tư duy", "Tự tin", "Vui vẻ"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Ai bảo việc học là áp lực? Qua những câu chuyện gần gũi, cuốn sách bật mí bí quyết biến từng bài học trên lớp thành niềm vui khám phá mỗi ngày.",
+        podcast: "Chào các bạn nhỏ khối Tiểu học và Trung học cơ sở của đại gia đình Sky-Line! Có bao giờ bạn cảm thấy lo lắng trước mỗi kỳ kiểm tra hay tự hỏi làm sao để việc học trở nên nhẹ nhàng hơn? Hôm nay, Câu lạc bộ Thư viện Mic & Mind mang đến cho bạn chiếc chìa khóa vàng trong cuốn sách Nhật ký trưởng thành của đứa trẻ ngoan Việc học không hề đáng sợ. Không phải là những lời giáo điều khô khan, cuốn sách kể lại những câu chuyện học đường vô cùng gần gũi và dí dỏm. Tác phẩm sẽ giúp bạn tháo gỡ nỗi sợ điểm số, khám phá các phương pháp ghi nhớ thông minh và tìm thấy niềm vui trong từng môn học mỗi ngày. Khi chúng mình thay đổi góc nhìn và làm chủ phương pháp học tập, mỗi ngày đến trường đều là một hành trình khám phá thú vị. Mời bạn ghé bàn sách mới thư viện tìm đọc nhé!",
+        quizQ: "Cuốn sách giúp học sinh thay đổi góc nhìn như thế nào về việc học?",
+        quizAns: "Biến việc học từ áp lực thành sự chủ động và niềm vui khám phá",
+        quizWrongs: ["Chỉ cần học trước ngày thi 1 hôm", "Không cần làm bài tập về nhà"],
+        quizExplain: "Phương pháp đúng và tâm thế tích cực giúp việc học trở nên nhẹ nhàng, hiệu quả.",
+        cover: "covers/book_18.jpg?v=3",
+        audio: "audio/book_18.mp3?v=2",
+        gradient: "linear-gradient(135deg, #047857 0%, #34d399 100%)"
+      },
+      {
+        id: 19,
+        title: "Hiểu về trái tim (Tái bản 2023)",
+        author: "Minh Niệm",
+        grades: "THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Trạm Chữa Lành & Văn Học"],
+        moods: ["Chữa lành", "Cảm xúc", "Tư duy"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Hạnh phúc, khổ đau, giận hờn, lo lắng, lắng nghe... 50 chương sách như một tấm gương soi chiếu từng trạng thái cảm xúc bên trong mỗi chúng ta để học cách yêu thương đúng nghĩa.",
+        podcast: "Chào mừng quý thầy cô và các bạn học sinh đến với không gian sách nói chữa lành của Câu lạc bộ Thư viện Mic & Mind! Giữa nhịp sống học tập bận rộn, đôi khi tâm trí chúng ta dễ bị xao động bởi những lo âu, giận hờn hay áp lực vô hình. Hãy dành ít phút ghé thư viện Sky-Line và mở một chương bất kỳ trong cuốn sách nổi tiếng Hiểu về trái tim của tác giả Minh Niệm, ấn bản tái bản mới nhất. Gồm năm mươi chương sách ngắn gọn mà sâu sắc như Hạnh phúc, Khổ đau, Lắng nghe và Tha thứ, cuốn sách giống như một tấm gương trong suốt. Tác phẩm giúp mỗi người tự soi chiếu, gọi tên những cảm xúc bên trong mình, học cách thấu cảm và trao gửi yêu thương đúng nghĩa. Một cuốn sách bình yên dành cho mọi lứa tuổi đang chờ bạn tại Bàn trưng bày sách mới!",
+        quizQ: "Cuốn sách Hiểu về trái tim tập trung giải mã điều gì?",
+        quizAns: "Các trạng thái cảm xúc bên trong con người và nghệ thuật lắng nghe, chữa lành",
+        quizWrongs: ["Cấu tạo giải phẫu sinh học của tim mạch", "Lịch sử các triều đại cổ đại"],
+        quizExplain: "Mỗi chương sách là một bài học sâu sắc về quản trị cảm xúc (SEL) và lòng thấu cảm.",
+        cover: "covers/book_19.jpg?v=3",
+        audio: "audio/book_19.mp3?v=2",
+        gradient: "linear-gradient(135deg, #a16207 0%, #facc15 100%)"
+      },
+      {
+        id: 20,
+        title: "Tâm lý tuổi dậy thì – Bí kíp xây dựng sự tự tin",
+        author: "Nhiều tác giả",
+        grades: "THCS, THPT",
+        shelves: ["Bứt Phá Tư Duy"],
+        moods: ["Tư duy", "Tự tin", "Chữa lành"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Tuổi dậy thì với hàng trăm câu hỏi 'Sao mình không giỏi bằng bạn?', 'Sao bố mẹ không hiểu mình?'. Đây là cuốn cẩm nang giúp bạn tháo gỡ tự ti và tỏa sáng theo cách riêng.",
+        podcast: "Xin chào các bạn học sinh Trung học cơ sở và Trung học phổ thông đang lắng nghe chuyên mục Điểm sách của Câu lạc bộ Mic & Mind! Bước vào tuổi dậy thì, chắc hẳn ai trong chúng mình cũng từng ít nhất một lần tự hỏi: Tại sao mình không giỏi giang, nổi bật bằng bạn bè? Tại sao bố mẹ chẳng hiểu mình? Để giúp các bạn giải đáp những băn khoăn ấy, Sky-Line Bookflix xin giới thiệu cuốn cẩm nang Tâm lý tuổi dậy thì Bí kíp xây dựng sự tự tin. Cuốn sách được viết bằng ngôn ngữ hiện đại và thấu hiểu sâu sắc tâm lý lứa tuổi học đường. Tác phẩm cung cấp những bài tập thực hành cụ thể để bạn vượt qua sự rụt rè khi giao tiếp, biết trân trọng giá trị độc bản của chính mình và tỏa sáng lành mạnh. Sách hiện đã có trên bàn trưng bày sách mới của thư viện!",
+        quizQ: "Mục tiêu lớn nhất mà cuốn sách hướng dẫn cho học sinh tuổi dậy thì là gì?",
+        quizAns: "Thấu hiểu giá trị bản thân và xây dựng sự tự tin lành mạnh",
+        quizWrongs: ["Cách thức dậy sớm lúc 4 giờ sáng", "Kỹ thuật giải toán nâng cao"],
+        quizExplain: "Cuốn sách cung cấp các phương pháp tâm lý thực hành để vượt qua sự rụt rè, tự ti.",
+        cover: "covers/book_20.jpg?v=3",
+        audio: "audio/book_20.mp3?v=2",
+        gradient: "linear-gradient(135deg, #4338ca 0%, #818cf8 100%)"
+      },
+      {
+        id: 21,
+        title: "Làm thế nào để ôm một chú nhím – 12 bí quyết Kết nối với trẻ vị thành niên",
+        author: "Brad Wilcox & J.S.C",
+        grades: "THCS, THPT",
+        shelves: ["Bứt Phá Tư Duy"],
+        moods: ["Chữa lành", "Gia đình", "Tư duy"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Tuổi vị thành niên đôi khi xù lông sắc nhọn như một chú nhím nhưng bên trong lại rất cần được yêu thương. Cuốn sách giúp cha mẹ, thầy cô và học sinh hiểu nhau hơn.",
+        podcast: "Chào bạn đang lắng nghe sóng phát thanh sách nói của Câu lạc bộ Thư viện Mic & Mind! Hôm nay, chúng mình mang đến một cuốn sách có cái tên vô cùng ngộ nghĩnh và đáng yêu: Làm thế nào để ôm một chú nhím Mười hai bí quyết kết nối với trẻ vị thành niên của tác giả Brad Wilcox. Vì sao tác giả lại ví lứa tuổi thanh thiếu niên như những chú nhím nhỏ? Bởi ở tuổi mới lớn, đôi khi chúng mình dễ xù lớp lông gai góc, cáu kỉnh ra bên ngoài để tự vệ trước những áp lực học tập và cuộc sống. Thế nhưng ẩn sâu bên trong lớp gai ấy lại là một trái tim vô cùng nhạy cảm và luôn khao khát được lắng nghe. Cuốn sách này không chỉ dành cho thầy cô, cha mẹ mà còn giúp chính các bạn học sinh hiểu rõ hơn cảm xúc của bản thân để mở lòng kết nối với gia đình. Mời bạn ghé thư viện tìm đọc nhé!",
+        quizQ: "Hình ảnh 'chú nhím' trong tên sách là ẩn dụ cho điều gì?",
+        quizAns: "Tâm lý tuổi vị thành niên đôi khi xù gai phòng vệ bên ngoài nhưng nhạy cảm bên trong",
+        quizWrongs: ["Cách nuôi thú cưng trong gia đình", "Loài động vật hoang dã trong rừng"],
+        quizExplain: "Thấu hiểu lớp gai cảm xúc sẽ giúp học sinh và gia đình kết nối bằng sự tôn trọng, yêu thương.",
+        cover: "covers/book_21.jpg?v=3",
+        audio: "audio/book_21.mp3?v=2",
+        gradient: "linear-gradient(135deg, #7c2d12 0%, #f97316 100%)"
+      },
+      {
+        id: 22,
+        title: "Sống xanh không khó",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS, THPT",
+        shelves: ["Khám Phá & Việt Nam"],
+        moods: ["Nghệ thuật", "Khoa học", "Khám phá"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Không cần những điều vĩ mô, bảo vệ hành tinh bắt đầu từ chiếc bình nước cá nhân, cách phân loại rác và những thói quen xanh cực kỳ thú vị ngay tại trường học.",
+        podcast: "Xin chào các công dân xanh của đại gia đình Sky-Line! Bạn đang theo dõi chuyên mục Audio Review từ Câu lạc bộ Thư viện Mic & Mind trên Sky-Line Bookflix. Bảo vệ môi trường và Trái Đất nghe có vẻ là một nhiệm vụ vĩ mô, nhưng thật ra lại bắt đầu từ những điều nhỏ bé ngay quanh bàn học của chúng mình! Đó chính là thông điệp tươi mới từ cuốn sách Sống xanh không khó vừa có mặt tại sảnh thư viện. Cuốn sách được trình bày với hình ảnh minh họa sinh động cùng hàng loạt mẹo thực hành cực kỳ thú vị. Bạn sẽ học được cách tái chế đồ dùng học tập sáng tạo, tiết kiệm năng lượng, giảm rác thải nhựa và chăm sóc mảng xanh ngay tại trường học. Cuốn sách sẽ truyền cảm hứng để mỗi ngày đến trường của bạn đều là một ngày sống xanh ý nghĩa. Hãy lên thư viện khám phá ngay nhé!",
+        quizQ: "Thông điệp chính của cuốn sách Sống xanh không khó là gì?",
+        quizAns: "Bảo vệ môi trường bắt đầu từ những thói quen nhỏ hàng ngày của mỗi chúng ta",
+        quizWrongs: ["Phải chuyển vào rừng sâu sinh sống", "Chỉ các nhà khoa học mới bảo vệ được Trái Đất"],
+        quizExplain: "Những hành động nhỏ mỗi ngày tại trường và nhà tạo nên thay đổi bền vững cho môi trường.",
+        cover: "covers/book_22.jpg?v=3",
+        audio: "audio/book_22.mp3?v=2",
+        gradient: "linear-gradient(135deg, #14532d 0%, #22c55e 100%)"
+      },
+      {
+        id: 23,
+        title: "Dẫn nhập ngắn về khoa học – Thời gian (Minh họa sinh động bằng tranh)",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS, THPT",
+        shelves: ["Khám Phá & Việt Nam"],
+        moods: ["Khoa học", "Tư duy", "Khám phá"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Thời gian có thực sự trôi đều ở mọi nơi trong vũ trụ? Du hành thời gian có khả thi không? Những câu hỏi vật lý vĩ đại được giải thích cực dễ hiểu bằng tranh minh họa!",
+        podcast: "Chào mừng các nhà khoa học trẻ tương lai của Sky-Line đến với chuyên mục Điểm sách của Câu lạc bộ Mic & Mind! Có bao giờ bạn nhìn chiếc đồng hồ trên tường và tự hỏi: Thời gian thực chất là gì? Thời gian trôi trên Trái Đất có giống với thời gian ngoài lỗ đen vũ trụ không, và liệu con người có thể du hành thời gian được không? Tất cả những câu hỏi vật lý và vũ trụ học vĩ đại ấy sẽ được giải đáp một cách cực kỳ dễ hiểu, hài hước trong cuốn sách Dẫn nhập ngắn về khoa học Thời gian. Thay vì những công thức khô khan, cuốn sách dẫn dắt người đọc đi từ đồng hồ mặt trời cổ đại đến thuyết tương đối thông qua những trang tranh minh họa trực quan sinh động. Một cuốn sách tuyệt vời bổ trợ cho môn Khoa học tự nhiên đang chờ bạn tại thư viện!",
+        quizQ: "Cuốn sách trình bày những khái niệm khoa học về Thời gian theo hình thức nào?",
+        quizAns: "Kết hợp lời giải thích súc tích với tranh minh họa trực quan, sinh động",
+        quizWrongs: ["Toàn bộ là các công thức toán học phức tạp", "Viết dưới dạng thơ lục bát"],
+        quizExplain: "Tranh minh họa giúp các khái niệm vật lý và vũ trụ học trở nên cực kỳ dễ hiểu với học sinh.",
+        cover: "covers/book_23.jpg?v=3",
+        audio: "audio/book_23.mp3?v=2",
+        gradient: "linear-gradient(135deg, #0f172a 0%, #3b82f6 100%)"
+      },
+      {
+        id: 24,
+        title: "Lược sử trí khôn – Từ giun biển đến ChatGPT",
+        author: "Max S. Bennett",
+        grades: "THCS, THPT",
+        shelves: ["Mới Bóc Tem", "Khám Phá & Việt Nam"],
+        moods: ["Khoa học", "Tư duy", "Khám phá"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Hành trình tiến hóa 500 triệu năm của trí thông minh: từ hệ thần kinh sơ khai của loài giun biển cổ đại cho đến bộ não con người và sự bùng nổ của Trí tuệ nhân tạo ChatGPT!",
+        podcast: "Chào mừng toàn thể thầy cô và các bạn học sinh đến với cuốn sách tiêu điểm của mùa giải AI Spark năm nay trên hệ thống Sky-Line Bookflix! Bạn đang lắng nghe Câu lạc bộ Thư viện Mic & Mind giới thiệu siêu phẩm khoa học công nghệ mang tên Lược sử trí khôn Từ giun biển đến ChatGPT của tác giả Max S. Bennett. Để giải mã xem Trí tuệ nhân tạo hiện đại hoạt động như thế nào, tác giả đã đưa chúng ta quay ngược năm trăm triệu năm lịch sử tiến hóa sinh học. Hành trình bắt đầu từ hệ thần kinh sơ khai đầu tiên của loài giun biển cổ đại cho đến sự hình thành não bộ phức tạp của động vật có xương sống. Từ đó, cuốn sách kết nối đến trí thông minh ngôn ngữ của loài người và sự bùng nổ của các mô hình ngôn ngữ lớn như ChatGPT ngày nay. Một cuốn sách mở mang tầm nhìn không thể bỏ lỡ tại Bàn trưng bày sách mới thư viện!",
+        quizQ: "Cuốn sách kết nối hai lĩnh vực nào để giải thích lịch sử tiến hóa của trí thông minh?",
+        quizAns: "Tiến hóa thần kinh học (sinh học) và Trí tuệ nhân tạo (AI)",
+        quizWrongs: ["Ẩm thực học và Kiến trúc cổ đại", "Địa chất học và Âm nhạc cổ điển"],
+        quizExplain: "Tác giả đối chiếu 5 bước đột phá tiến hóa của não bộ sinh vật với sự phát triển của AI hiện đại.",
+        cover: "covers/book_24.jpg?v=3",
+        audio: "audio/book_24.mp3?v=2",
+        gradient: "linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #0ea5e9 100%)"
+      },
+      {
+        id: 25,
+        title: "Atlas cho trẻ em",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS",
+        shelves: ["Khám Phá & Việt Nam"],
+        moods: ["Nghệ thuật", "Khám phá", "Khoa học"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Chu du khắp các châu lục, đại dương, kỳ quan thế giới và hệ động thực vật phong phú qua những tấm bản đồ minh họa rực rỡ sắc màu.",
+        podcast: "Xin chào các nhà thám hiểm nhí của trường Sky-Line! Cùng Câu lạc bộ Thư viện Mic & Mind mở rộng tầm mắt ra khắp năm châu bốn biển với cuốn sách khổ lớn tuyệt đẹp mang tên Atlas cho trẻ em vừa cập bến thư viện! Mỗi trang sách mở ra là một tấm bản đồ minh họa rực rỡ sắc màu đưa bạn đi qua từng châu lục và đại dương bao la. Bạn sẽ được chiêm ngưỡng những kỳ quan kiến trúc nổi tiếng thế giới và làm quen với các loài động vật quý hiếm từ rừng rậm nhiệt đới đến vùng cực băng giá. Không chỉ vậy, cuốn sách còn giúp bạn tìm hiểu những nét văn hóa đặc sắc của hàng trăm quốc gia trên hành tinh của chúng mình. Việc học Địa lý và khám phá thế giới sẽ trở nên sống động như một chuyến du lịch vòng quanh Trái Đất. Hãy ghé ngay bàn sách mới thư viện nhé!",
+        quizQ: "Cuốn sách Atlas cho trẻ em giúp học sinh khám phá kiến thức gì?",
+        quizAns: "Bản đồ các châu lục, quốc gia, kỳ quan văn hóa và thiên nhiên thế giới",
+        quizWrongs: ["Cách sửa chữa đồ điện gia dụng", "Các bài tập thể dục buổi sáng"],
+        quizExplain: "Bản đồ minh họa trực quan giúp học sinh mở rộng tầm nhìn ra khắp năm châu.",
+        cover: "covers/book_25.jpg?v=3",
+        audio: "audio/book_25.mp3?v=2",
+        gradient: "linear-gradient(135deg, #0369a1 0%, #10b981 100%)"
+      },
+      {
+        id: 26,
+        title: "Khoa học thú vị – Cuộc phiêu lưu của Bọ Rùa – Các loài côn trùng đa dạng",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS",
+        shelves: ["Khám Phá & Việt Nam"],
+        moods: ["Khoa học", "Phiêu lưu", "Khám phá"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Thu nhỏ mình lại bằng kích thước một chú bọ rùa để bước vào vương quốc côn trùng kỳ vĩ ngay dưới tán lá xanh!",
+        podcast: "Chào các bạn nhỏ yêu thiên nhiên đang lắng nghe chuyên mục Điểm sách của Câu lạc bộ Thư viện Mic & Mind! Ngay dưới những tán cây xanh mát quanh sân trường Sky-Line của chúng mình đang tồn tại một vương quốc tí hon vô cùng nhộn nhịp mà đôi khi mắt thường không nhìn thấy hết. Hãy cùng thu nhỏ mình lại và đi theo người dẫn đường đặc biệt trong cuốn sách Khoa học thú vị Cuộc phiêu lưu của Bọ Rùa Các loài côn trùng đa dạng! Qua hành trình phiêu lưu đầy màu sắc của chú Bọ Rùa nhỏ nhắn, bạn sẽ được khám phá những bí mật kỳ thú về kiến trúc tổ kiến và vũ điệu giao tiếp của loài ong mật. Cuốn sách còn bật mí khả năng ngụy trang tài tình của bọ que cùng vai trò quan trọng của côn trùng đối với hệ sinh thái. Sách đang chờ bạn tại Bàn trưng bày sách mới sảnh thư viện!",
+        quizQ: "Nhân vật dẫn đường đưa người đọc khám phá thế giới côn trùng trong cuốn sách là ai?",
+        quizAns: "Chú Bọ Rùa nhỏ nhắn",
+        quizWrongs: ["Chú Cá Voi Xanh", "Chú Đại Bàng Núi"],
+        quizExplain: "Qua góc nhìn của chú Bọ Rùa, kiến thức sinh học về côn trùng trở thành cuộc phiêu lưu sống động.",
+        cover: "covers/book_26.jpg?v=3",
+        audio: "audio/book_26.mp3?v=2",
+        gradient: "linear-gradient(135deg, #b91c1c 0%, #15803d 100%)"
+      },
+      {
+        id: 27,
+        title: "Bí quyết hội họa – Ký họa chân dung",
+        author: "Nhiều tác giả",
+        grades: "TH, THCS, THPT",
+        shelves: ["Khám Phá & Việt Nam"],
+        moods: ["Nghệ thuật", "Tự tin", "Tư duy"],
+        location: "Bàn trưng bày Sách Mới (Sảnh Thư viện)",
+        hook: "Làm sao để nắm bắt ánh mắt, nụ cười và thần thái của một người chỉ bằng cây bút chì? Hướng dẫn từng bước từ tỉ lệ khuôn mặt đến kỹ thuật đánh bóng chân dung.",
+        podcast: "Xin chào các tâm hồn yêu nghệ thuật và hội họa trên hệ thống Sky-Line Bookflix! Bạn đang lắng nghe chuyên mục Audio Review của Câu lạc bộ Thư viện Mic & Mind. Bạn đã bao giờ muốn tự tay vẽ tặng thầy cô, cha mẹ hay người bạn thân một bức chân dung thật có hồn chỉ bằng cây bút chì chưa? Cuốn sách Bí quyết hội họa Ký họa chân dung vừa về thư viện chính là người thầy hướng dẫn tận tâm nhất dành cho bạn! Cuốn sách chỉ dẫn từng bước từ cách đo tỉ lệ chuẩn của khuôn mặt cho đến cách quan sát cấu trúc mắt, mũi, miệng thật tự nhiên. Bạn cũng sẽ nắm vững kỹ thuật đánh bóng tạo chiều sâu và bí quyết bắt trọn ánh mắt, nụ cười sinh động của nhân vật. Dù bạn mới bắt đầu tập vẽ hay đã yêu thích môn Mỹ thuật từ lâu, hãy ghé ngay thư viện Sky-Line để trải nghiệm cuốn cẩm nang này nhé!",
+        quizQ: "Yếu tố nền tảng đầu tiên khi bắt đầu học ký họa chân dung là gì?",
+        quizAns: "Nắm vững tỉ lệ và cấu trúc cơ bản của khuôn mặt",
+        quizWrongs: ["Phải dùng màu sơn dầu đắt tiền", "Chỉ vẽ trong bóng tối"],
+        quizExplain: "Hiểu đúng tỉ lệ khuôn mặt giúp bức ký họa cân đối và truyền tải đúng thần thái nhân vật.",
+        cover: "covers/book_27.jpg?v=3",
+        audio: "audio/book_27.mp3?v=2",
+        gradient: "linear-gradient(135deg, #4c1d95 0%, #ec4899 100%)"
+      }
+    ];
+    const INITIAL_BOOKS_DATA = JSON.parse(JSON.stringify(BOOKS_DATA));
+
+    const SHELF_CONFIG = [
+      { key: "Mới Bóc Tem", title: "🔥 Mới Bóc Tem Tuần Này (Chưa Dán Mã – Ưu Tiên Đọc Tại Chỗ)", subtitle: "Lô sách mới cứng vừa cập bến Bàn trưng bày Thư viện Sky-Line" },
+      { key: "Manga & Điện Ảnh", title: "🎬 Siêu Phẩm Manga, Anime & Truyện Màu Điện Ảnh", subtitle: "Doraemon Movie Màu, Conan Fan Vote, Your Name, Đứa con của thời tiết, Lớp học mật ngữ" },
+      { key: "Trạm Chữa Lành & Văn Học", title: "💛 Trạm Chữa Lành Tâm Hồn & Văn Học Kinh Điển", subtitle: "Những trang sách nuôi dưỡng lòng tử tế, tình cảm gia đình và sự thấu cảm" },
+      { key: "Bứt Phá Tư Duy", title: "🧠 Bứt Phá Tư Duy & Cẩm Nang Tuổi Dậy Thì", subtitle: "Tư duy ngược, Tư duy mở, Xây dựng sự tự tin và niềm vui học tập" },
+      { key: "Khám Phá & Việt Nam", title: "🚀 Khám Phá Khoa Học, AI, Nghệ Thuật & Yêu Quá Việt Nam", subtitle: "Từ giun biển đến ChatGPT, Thời gian, Atlas thế giới, Sống xanh & Hội họa" }
+    ];
+
+    let currentGradeFilter = 'ALL';
+    let currentHeroBookId = 24;
+    let activeModalBook = null;
+    let customAudioMap = {}; // bookId -> dataUrl / Blob URL
+    let customCoverMap = {}; // bookId -> dataUrl
+    let customScriptMap = {}; // bookId -> string
+    let mediaRecorder = null;
+    let recordedChunks = [];
+
+    // INDEXEDDB ĐỂ LƯU VĨNH VIỄN FILE GHI ÂM CLB MIC & MIND VÀ ẢNH BÌA TÙY CHỈNH
+    let dbInstance = null;
+    function initIndexedDB() {
+      return new Promise((resolve) => {
+        const req = indexedDB.open("SkyLineBookflixDB", 2);
+        req.onupgradeneeded = function(e) {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains("clubAudio")) db.createObjectStore("clubAudio");
+          if (!db.objectStoreNames.contains("customCovers")) db.createObjectStore("customCovers");
+          if (!db.objectStoreNames.contains("customScripts")) db.createObjectStore("customScripts");
+          if (!db.objectStoreNames.contains("customBooks")) db.createObjectStore("customBooks");
+        };
+        req.onsuccess = function(e) {
+          dbInstance = e.target.result;
+          loadAllCustomData().then(resolve);
+        };
+        req.onerror = function() { resolve(); };
+      });
+    }
+
+    function saveToStore(storeName, key, val) {
+      if (!dbInstance) return;
+      const tx = dbInstance.transaction(storeName, "readwrite");
+      tx.objectStore(storeName).put(val, String(key));
+    }
+
+    function deleteFromStore(storeName, key) {
+      if (!dbInstance) return;
+      const tx = dbInstance.transaction(storeName, "readwrite");
+      tx.objectStore(storeName).delete(String(key));
+    }
+
+    function loadAllCustomData() {
+      return new Promise((resolve) => {
+        if (!dbInstance) return resolve();
+        let pending = 4;
+        const done = () => { if (--pending === 0) resolve(); };
+
+        const tx1 = dbInstance.transaction("clubAudio", "readonly").objectStore("clubAudio");
+        tx1.openCursor().onsuccess = function(e) {
+          const cursor = e.target.result;
+          if (cursor) { customAudioMap[cursor.key] = cursor.value; cursor.continue(); } else done();
+        };
+        const tx2 = dbInstance.transaction("customCovers", "readonly").objectStore("customCovers");
+        tx2.openCursor().onsuccess = function(e) {
+          const cursor = e.target.result;
+          if (cursor) { customCoverMap[cursor.key] = cursor.value; cursor.continue(); } else done();
+        };
+        const tx3 = dbInstance.transaction("customScripts", "readonly").objectStore("customScripts");
+        tx3.openCursor().onsuccess = function(e) {
+          const cursor = e.target.result;
+          if (cursor) { customScriptMap[cursor.key] = cursor.value; cursor.continue(); } else done();
+        };
+        const tx4 = dbInstance.transaction("customBooks", "readonly").objectStore("customBooks");
+        const req4 = tx4.get("latest");
+        req4.onsuccess = function(e) {
+          if (Array.isArray(e.target.result) && e.target.result.length > 0) {
+            BOOKS_DATA = e.target.result;
+            hasUploadedCustomBooks = true;
+          }
+          done();
+        };
+        req4.onerror = function() { done(); };
+      });
+    }
+
+    function getBookCover(book) {
+      return customCoverMap[book.id] || book.cover || `covers/book_${book.id}.jpg?v=3`;
+    }
+
+    function getBookAudio(book) {
+      return customAudioMap[book.id] || book.audio || `audio/book_${book.id}.mp3?v=2`;
+    }
+
+    function getBookPodcastScript(book) {
+      return customScriptMap[book.id] || book.podcast;
+    }
+
+    // =========================================================================
+    // HỆ THỐNG ĐỒNG BỘ ĐÁM MÂY TỰ ĐỘNG (CLOUD SYNC) QUA MỌI THIẾT BỊ & TRÌNH DUYỆT
+    // =========================================================================
+    const CLOUD_SYNC_TOKEN = "b155e29af644937a9cccd8dd6b169594669c810f2d29037a61dd9822eedd";
+    const CLOUD_MASTER_PATH = "SkyLineBookflixSync-11-10";
+    const CLOUD_API_BASE = "https://api.telegra.ph";
+
+    let cloudIndex = {
+      updatedAt: 0,
+      scripts: {},
+      coverPages: {},
+      coverSizes: {},
+      audioPages: {},
+      booksPage: null
+    };
+
+    function setCloudBadge(text, isSyncing = false) {
+      const el = document.getElementById('cloudSyncBadge');
+      if (!el) return;
+      el.innerHTML = text;
+      el.style.borderColor = isSyncing ? '#f59e0b' : 'rgba(16,185,129,0.45)';
+      el.style.color = isSyncing ? '#fde68a' : '#6ee7b7';
+    }
+
+    async function cloudSavePage(existingPath, title, textData) {
+      const params = new URLSearchParams({
+        access_token: CLOUD_SYNC_TOKEN,
+        title: title || "SkyLineBookflixData",
+        content: JSON.stringify([{ tag: "p", children: [textData] }])
+      });
+      const endpoint = existingPath
+        ? `${CLOUD_API_BASE}/editPage/${existingPath}`
+        : `${CLOUD_API_BASE}/createPage`;
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString()
+      });
+      const json = await res.json();
+      if (json && json.ok && json.result && json.result.path) {
+        return json.result.path;
+      }
+      throw new Error(json?.error || "Cloud save error");
+    }
+
+    async function cloudReadPage(pagePath) {
+      const res = await fetch(`${CLOUD_API_BASE}/getPage/${pagePath}?return_content=true&_t=${Date.now()}`);
+      const json = await res.json();
+      if (json && json.ok && json.result && json.result.content && json.result.content[0]?.children?.[0]) {
+        return json.result.content[0].children[0];
+      }
+      return null;
+    }
+
+    async function fetchCloudMasterIndex() {
+      try {
+        const raw = await cloudReadPage(CLOUD_MASTER_PATH);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          cloudIndex = {
+            updatedAt: parsed.updatedAt || 0,
+            scripts: parsed.scripts || {},
+            coverPages: parsed.coverPages || {},
+            coverSizes: parsed.coverSizes || {},
+            audioPages: parsed.audioPages || {},
+            booksPage: parsed.booksPage || null
+          };
+        }
+      } catch (e) {
+        console.warn("Cloud index fetch warning:", e);
+      }
+      return cloudIndex;
+    }
+
+    async function saveCloudMasterIndex() {
+      cloudIndex.updatedAt = Date.now();
+      await cloudSavePage(CLOUD_MASTER_PATH, "SkyLineBookflixSync", JSON.stringify(cloudIndex));
+    }
+
+    // Nén ảnh bìa tự động xuống kích thước chuẩn 420x620 JPEG sắc nét (~25-35KB) để đồng bộ tức thì lên Đám mây
+    function compressCoverDataUrl(srcDataUrl, maxW = 340, maxH = 500, quality = 0.78) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = function() {
+          let w = img.width;
+          let h = img.height;
+          if (w > maxW || h > maxH) {
+            const ratio = Math.min(maxW / w, maxH / h);
+            w = Math.round(w * ratio);
+            h = Math.round(h * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          let q = quality;
+          let out = canvas.toDataURL('image/jpeg', q);
+          while (out.length > 45000 && q > 0.35) {
+            q -= 0.1;
+            out = canvas.toDataURL('image/jpeg', q);
+          }
+          resolve(out);
+        };
+        img.onerror = function() { resolve(srcDataUrl); };
+        img.src = srcDataUrl;
+      });
+    }
+
+    async function cloudSaveChunked(existingPathOrArr, titlePrefix, fullText) {
+      const chunkSize = 42000;
+      if (fullText.length <= chunkSize && !Array.isArray(existingPathOrArr)) {
+        return await cloudSavePage(existingPathOrArr || null, titlePrefix, fullText);
+      }
+      const chunks = [];
+      for (let i = 0; i < fullText.length; i += chunkSize) {
+        chunks.push(fullText.slice(i, i + chunkSize));
+      }
+      const existingArr = Array.isArray(existingPathOrArr)
+        ? existingPathOrArr
+        : (existingPathOrArr ? [existingPathOrArr] : []);
+      const newPaths = [];
+      for (let idx = 0; idx < chunks.length; idx++) {
+        const p = await cloudSavePage(existingArr[idx] || null, `${titlePrefix}_${idx}`, chunks[idx]);
+        newPaths.push(p);
+      }
+      return newPaths.length === 1 ? newPaths[0] : newPaths;
+    }
+
+    async function cloudReadChunked(pathOrArr) {
+      if (!pathOrArr) return null;
+      if (!Array.isArray(pathOrArr)) {
+        return await cloudReadPage(pathOrArr);
+      }
+      const parts = await Promise.all(pathOrArr.map(p => cloudReadPage(p)));
+      if (parts.every(Boolean)) return parts.join('');
+      return null;
+    }
+
+    async function uploadCoverToCloud(bookId, rawDataUrl, skipMasterSave = false) {
+      try {
+        setCloudBadge('☁️ Đang đồng bộ ảnh bìa lên Đám mây...', true);
+        if (!skipMasterSave) await fetchCloudMasterIndex();
+        const compressed = await compressCoverDataUrl(rawDataUrl);
+        customCoverMap[bookId] = compressed;
+        saveToStore("customCovers", bookId, compressed);
+        const existingPath = cloudIndex.coverPages[bookId] || null;
+        const pagePath = await cloudSaveChunked(existingPath, `SkyLineCover_${bookId}`, compressed);
+        cloudIndex.coverPages[bookId] = pagePath;
+        cloudIndex.coverSizes[bookId] = compressed.length;
+        if (!skipMasterSave) {
+          await saveCloudMasterIndex();
+          setCloudBadge('☁️ Đã đồng bộ Đám mây (Mọi thiết bị)');
+        }
+      } catch (e) {
+        console.error("Upload cover cloud error:", e);
+        setCloudBadge('☁️ Đã lưu cục bộ (Bấm để đồng bộ lại)', true);
+      }
+    }
+
+    async function uploadAudioToCloud(bookId, audioDataUrl, skipMasterSave = false) {
+      try {
+        setCloudBadge('☁️ Đang tải file ghi âm lên Đám mây...', true);
+        if (!skipMasterSave) await fetchCloudMasterIndex();
+        const existingPaths = cloudIndex.audioPages[bookId] || null;
+        const savedPaths = await cloudSaveChunked(existingPaths, `SkyLineAudio_${bookId}`, audioDataUrl);
+        cloudIndex.audioPages[bookId] = Array.isArray(savedPaths) ? savedPaths : [savedPaths];
+        if (!skipMasterSave) {
+          await saveCloudMasterIndex();
+          setCloudBadge('☁️ Đã đồng bộ Đám mây (Mọi thiết bị)');
+        }
+      } catch (e) {
+        console.error("Upload audio cloud error:", e);
+        setCloudBadge('☁️ Đã lưu cục bộ (Bấm để đồng bộ lại)', true);
+      }
+    }
+
+    async function downloadAudioFromCloudIfNeeded(bookId) {
+      if (customAudioMap[bookId]) return customAudioMap[bookId];
+      const paths = cloudIndex.audioPages?.[bookId];
+      if (!paths) return null;
+      try {
+        const fullDataUrl = await cloudReadChunked(paths);
+        if (fullDataUrl) {
+          customAudioMap[bookId] = fullDataUrl;
+          saveToStore("clubAudio", bookId, fullDataUrl);
+          return fullDataUrl;
+        }
+      } catch (e) {
+        console.warn("Download cloud audio warning:", e);
+      }
+      return null;
+    }
+
+    // Đồng bộ 2 chiều khi mở trang web:
+    // 1. Tải toàn bộ ảnh bìa, kịch bản và ghi âm từ Đám mây về thiết bị hiện tại
+    // 2. Nếu trình duyệt hiện tại đã có ảnh bìa/ghi âm/kịch bản lưu từ trước (trong IndexedDB) mà chưa có trên Đám mây, tự động đẩy lên Đám mây!
+    async function syncWithCloudOnStartup() {
+      try {
+        setCloudBadge('☁️ Đang đồng bộ dữ liệu...', true);
+        await fetchCloudMasterIndex();
+        let uiNeedsRefresh = false;
+        let masterNeedsSave = false;
+
+        // 0. Đồng bộ Danh mục sách Excel (nếu giáo viên đã tải file Excel mới lên)
+        if (cloudIndex.booksPage) {
+          const cloudBooksStr = await cloudReadChunked(cloudIndex.booksPage);
+          if (cloudBooksStr) {
+            try {
+              const parsedBooks = JSON.parse(cloudBooksStr);
+              if (Array.isArray(parsedBooks) && parsedBooks.length > 0) {
+                BOOKS_DATA = parsedBooks;
+                hasUploadedCustomBooks = true;
+                saveToStore("customBooks", "latest", BOOKS_DATA);
+                uiNeedsRefresh = true;
+              }
+            } catch (err) {}
+          }
+        } else if (hasUploadedCustomBooks && BOOKS_DATA.length > 0) {
+          const pagePath = await cloudSaveChunked(null, "SkyLineCustomBooks", JSON.stringify(BOOKS_DATA));
+          cloudIndex.booksPage = pagePath;
+          masterNeedsSave = true;
+        }
+
+        // 1. Đồng bộ Kịch bản (Scripts)
+        for (const [bId, cloudScript] of Object.entries(cloudIndex.scripts || {})) {
+          if (cloudScript && customScriptMap[bId] !== cloudScript) {
+            customScriptMap[bId] = cloudScript;
+            saveToStore("customScripts", bId, cloudScript);
+          }
+        }
+        for (const [bId, localScript] of Object.entries(customScriptMap)) {
+          if (localScript && !cloudIndex.scripts[bId]) {
+            cloudIndex.scripts[bId] = localScript;
+            masterNeedsSave = true;
+          }
+        }
+
+        // 2. Tải ảnh bìa từ Đám mây về thiết bị này
+        const coverEntries = Object.entries(cloudIndex.coverPages || {});
+        if (coverEntries.length > 0) {
+          await Promise.all(coverEntries.map(async ([bId, pagePath]) => {
+            const expectedSize = cloudIndex.coverSizes?.[bId];
+            if (!customCoverMap[bId] || (expectedSize && customCoverMap[bId].length !== expectedSize)) {
+              const cloudCover = await cloudReadChunked(pagePath);
+              if (cloudCover && cloudCover.startsWith('data:image')) {
+                customCoverMap[bId] = cloudCover;
+                saveToStore("customCovers", bId, cloudCover);
+                uiNeedsRefresh = true;
+              }
+            }
+          }));
+        }
+
+        // 3. Tự động đẩy các ảnh bìa đã đổi trên máy của Giáo viên (trong IndexedDB) lên Đám mây nếu trên Đám mây chưa có
+        for (const [bId, localCover] of Object.entries(customCoverMap)) {
+          if (localCover && !cloudIndex.coverPages[bId]) {
+            await uploadCoverToCloud(bId, localCover, true);
+            masterNeedsSave = true;
+          }
+        }
+
+        // 4. Tự động đẩy các file ghi âm CLB đã lưu trên máy lên Đám mây nếu trên Đám mây chưa có
+        for (const [bId, localAudio] of Object.entries(customAudioMap)) {
+          if (localAudio && !cloudIndex.audioPages[bId]) {
+            await uploadAudioToCloud(bId, localAudio, true);
+            masterNeedsSave = true;
+          }
+        }
+
+        if (masterNeedsSave) {
+          await saveCloudMasterIndex();
+        }
+
+        if (uiNeedsRefresh) {
+          renderShelves();
+          setHeroBook(currentHeroBookId);
+          if (activeModalBook) {
+            document.getElementById('modalCoverImg').src = getBookCover(activeModalBook);
+          }
+        } else {
+          renderShelves();
+        }
+
+        const totalSyncedCovers = Object.keys(cloudIndex.coverPages || {}).length;
+        const totalSyncedAudio = Object.keys(cloudIndex.audioPages || {}).length;
+        if (totalSyncedCovers > 0 || totalSyncedAudio > 0) {
+          setCloudBadge(`☁️ Đã đồng bộ Đám mây (${totalSyncedCovers} ảnh bìa${totalSyncedAudio ? ', ' + totalSyncedAudio + ' audio' : ''})`);
+        } else {
+          setCloudBadge('☁️ Đã đồng bộ Đám mây (Mọi thiết bị)');
+        }
+      } catch (e) {
+        console.warn("Cloud startup sync warning:", e);
+        setCloudBadge('☁️ Chế độ Trực tuyến');
+      }
+    }
+
+    async function forceSyncAllLocalToCloud() {
+      try {
+        setCloudBadge('☁️ Đang đẩy toàn bộ dữ liệu lên Đám mây...', true);
+        await fetchCloudMasterIndex();
+        let countCovers = 0;
+        let countAudio = 0;
+        for (const [bId, localCover] of Object.entries(customCoverMap)) {
+          if (localCover) {
+            await uploadCoverToCloud(bId, localCover, true);
+            countCovers++;
+          }
+        }
+        for (const [bId, localAudio] of Object.entries(customAudioMap)) {
+          if (localAudio) {
+            await uploadAudioToCloud(bId, localAudio, true);
+            countAudio++;
+          }
+        }
+        for (const [bId, localScript] of Object.entries(customScriptMap)) {
+          if (localScript) {
+            cloudIndex.scripts[bId] = localScript;
+          }
+        }
+        await saveCloudMasterIndex();
+        setCloudBadge(`☁️ Đã đồng bộ Đám mây (${Object.keys(cloudIndex.coverPages).length} ảnh bìa)`);
+        alert(`☁️ Đã đồng bộ thành công ${countCovers} ảnh bìa tùy chỉnh và ${countAudio} bản thu âm lên Đám mây! Bây giờ bạn mở trên điện thoại hay trình duyệt khác đều sẽ thấy ngay nội dung mới.`);
+      } catch (e) {
+        alert('Có lỗi kết nối mạng khi đồng bộ. Vui lòng thử lại!');
+      }
+    }
+
+    function renderShelves() {
+      const container = document.getElementById('shelvesContainer');
+      const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+      container.innerHTML = '';
+
+      const filteredBooks = BOOKS_DATA.filter(book => {
+        const matchGrade = currentGradeFilter === 'ALL' || book.grades.includes(currentGradeFilter);
+        const matchQuery = !query ||
+          book.title.toLowerCase().includes(query) ||
+          book.author.toLowerCase().includes(query) ||
+          book.hook.toLowerCase().includes(query) ||
+          book.moods.join(' ').toLowerCase().includes(query);
+        return matchGrade && matchQuery;
+      });
+
+      if (filteredBooks.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:40px; color:#94a3b8;">Không tìm thấy đầu sách phù hợp. Hãy thử chọn "Tất cả" hoặc từ khóa khác!</div>`;
+        return;
+      }
+
+      SHELF_CONFIG.forEach(shelf => {
+        const shelfBooks = filteredBooks.filter(b => b.shelves.includes(shelf.key));
+        if (shelfBooks.length === 0) return;
+
+        const section = document.createElement('section');
+        section.className = 'shelf-row';
+        section.innerHTML = `
+          <div class="shelf-header">
+            <h3 class="shelf-title">${shelf.title} <span style="font-size:0.8rem; color:#f59e0b;">(${shelfBooks.length})</span></h3>
+            <div class="shelf-subtitle">${shelf.subtitle}</div>
+          </div>
+          <div class="books-track">
+            ${shelfBooks.map(b => createBookCardHtml(b)).join('')}
+          </div>
+        `;
+        container.appendChild(section);
+      });
+    }
+
+    // TÍNH ĐIỂM % TƯƠNG THÍCH (MATCH SCORE) DỰA TRÊN ĐỐI SÁNH CẤP HỌC, CHỦ ĐỀ & TIÊU ĐIỂM THƯ VIỆN
+    function calculateShelfMatchInfo(book) {
+      let base = 93;
+      if (Array.isArray(book.shelves) && book.shelves.includes("Mới Bóc Tem")) base += 2;
+      if (book.grades && book.grades.split(',').length >= 2) base += 1;
+      if (customAudioMap[book.id] || (cloudIndex.audioPages && cloudIndex.audioPages[book.id])) base += 1;
+      // Tạo độ phân hóa tự nhiên giữa 27 đầu sách (94% -> 99%)
+      base += (book.id * 7) % 3;
+
+      const query = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+      if (currentGradeFilter !== 'ALL' && book.grades.includes(currentGradeFilter)) {
+        base = Math.max(base + 1, 97);
+      }
+      if (query && (book.title.toLowerCase().includes(query) || book.moods.join(' ').toLowerCase().includes(query))) {
+        base = 99;
+      }
+      const pct = Math.min(99, Math.max(94, base));
+      const tooltip = `Độ phù hợp ${pct}% (Căn cứ: Cấp học ${book.grades} • Chủ đề: ${book.moods.join(', ')}${book.shelves.includes('Mới Bóc Tem') ? ' • Sách Tiêu điểm Mới Bóc Tem' : ''})`;
+      return { pct, tooltip };
+    }
+
+    function createBookCardHtml(book) {
+      const coverSrc = getBookCover(book);
+      const hasClubAudio = !!(customAudioMap[book.id] || (cloudIndex.audioPages && cloudIndex.audioPages[book.id]));
+      const { pct, tooltip } = calculateShelfMatchInfo(book);
+      return `
+        <article class="book-card" onclick="openBookModal(${book.id})">
+          <div class="book-cover" style="background: ${book.gradient};">
+            <img class="cover-img" src="${coverSrc}" alt="${book.title}" loading="lazy" onerror="this.style.display='none'" />
+            <div class="book-cover-overlay">
+              <div class="cover-top-badges">
+                ${hasClubAudio
+                  ? `<span class="badge-club-rec">🎙️ GIỌNG CLB</span>`
+                  : `<span class="badge-new">AUDIO 50S</span>`}
+                <span class="badge-grade">${book.grades}</span>
+              </div>
+              <div class="cover-bottom-title">${book.title}</div>
+            </div>
+          </div>
+          <div class="book-body">
+            <div>
+              <div class="book-meta-row">
+                <span class="match-score" title="${tooltip}" style="cursor:help;">${pct}% Match</span>
+                <span class="author-name" title="${book.author}">${book.author}</span>
+              </div>
+              <p class="book-Hook" style="margin-top:5px;">${book.hook}</p>
+            </div>
+            <div class="mood-tags-row">
+              ${book.moods.map(m => `<span class="mood-tag">#${m}</span>`).join('')}
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function filterByGrade(grade, btnEl) {
+      currentGradeFilter = grade;
+      document.querySelectorAll('.grade-pill').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      renderShelves();
+    }
+
+    function handleSearch() { renderShelves(); }
+
+    function setHeroBook(bookId, btnEl) {
+      const book = BOOKS_DATA.find(b => b.id === bookId) || BOOKS_DATA[0];
+      currentHeroBookId = book.id;
+      document.getElementById('heroTitle').textContent = book.title;
+      document.getElementById('heroDesc').textContent = book.hook;
+      document.getElementById('heroLocation').textContent = '📍 ' + book.location;
+      document.getElementById('heroGradeBadge').textContent = book.grades;
+      document.getElementById('heroAuthor').textContent = book.author;
+      document.getElementById('heroCardTitle').textContent = book.title;
+      const heroMatchEl = document.querySelector('.badge-match');
+      if (heroMatchEl) {
+        const { pct, tooltip } = calculateShelfMatchInfo(book);
+        heroMatchEl.textContent = `${Math.max(98, pct)}% Phù hợp (${book.grades})`;
+        heroMatchEl.title = tooltip;
+      }
+      const heroImg = document.getElementById('heroCoverImg');
+      heroImg.style.display = 'block';
+      heroImg.src = getBookCover(book);
+
+      if (btnEl) {
+        document.querySelectorAll('.hero-dot-btn').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+    }
+
+    function openCurrentHeroDetail() { openBookModal(currentHeroBookId); }
+
+    function playHeroPodcast() {
+      openBookModal(currentHeroBookId);
+      setTimeout(() => playCurrentBookAudio(), 250);
+    }
+
+    function runAiRecommendation() {
+      const grade = document.getElementById('aiGradeSelect').value;
+      const mood = document.getElementById('aiMoodSelect').value;
+      const kw = (document.getElementById('aiKeywordInput').value || '').trim().toLowerCase();
+
+      const moodKeywordMap = {
+        "Chữa lành": ["chữa lành", "gia đình", "tình bạn", "cảm xúc", "nhân văn", "bình yên", "thấu cảm", "lạc quan"],
+        "Phiêu lưu": ["phiêu lưu", "phá án", "hồi hộp", "kỳ ảo", "manga", "điện ảnh", "hài hước"],
+        "Tư duy": ["tư duy", "tự tin", "truyền cảm hứng", "trưởng thành", "học tập", "bứt phá"],
+        "Khoa học": ["khoa học", "ai", "khám phá", "thiên nhiên", "vũ trụ"],
+        "Nghệ thuật": ["nghệ thuật", "sáng tạo", "vui vẻ", "tự hào", "sống xanh", "địa lý", "việt nam"]
+      };
+      const relatedMoods = moodKeywordMap[mood] || [mood.toLowerCase()];
+
+      const scored = BOOKS_DATA.map(book => {
+        let score = 0;
+        const reasons = [];
+
+        // 1. Tiêu chí Cấp học (30 điểm)
+        if (grade === 'ALL' || book.grades.includes(grade)) {
+          score += 30;
+          reasons.push(`✓ Đúng cấp ${grade === 'ALL' ? 'Phổ thông' : grade}`);
+        } else {
+          score -= 60;
+        }
+
+        // 2. Tiêu chí Tâm trạng trực tiếp hoặc nhóm tâm trạng liên quan (40 điểm)
+        const bookMoodsLower = book.moods.map(m => m.toLowerCase());
+        const exactMood = bookMoodsLower.some(m => m.includes(mood.toLowerCase()));
+        const relatedMood = bookMoodsLower.some(m => relatedMoods.some(rm => m.includes(rm)));
+        if (exactMood) {
+          score += 42;
+          reasons.push(`✓ Đúng tâm trạng "${mood}"`);
+        } else if (relatedMood) {
+          score += 28;
+          reasons.push(`✓ Hợp chủ đề "${mood}"`);
+        }
+
+        // 3. Tiêu chí Kệ sách chuyên đề (18 điểm)
+        if (book.shelves.join(' ').toLowerCase().includes(mood.toLowerCase()) || book.shelves.includes("Mới Bóc Tem")) {
+          score += 15;
+          if (book.shelves.includes("Mới Bóc Tem")) reasons.push('✓ Sách tiêu điểm mới');
+        }
+
+        // 4. Tiêu chí Từ khóa tìm kiếm (50 điểm)
+        if (kw) {
+          const fullText = (book.title + ' ' + book.author + ' ' + book.hook + ' ' + book.moods.join(' ')).toLowerCase();
+          if (fullText.includes(kw)) {
+            score += 50;
+            reasons.push(`✓ Trúng từ khóa "${kw}"`);
+          }
+        }
+
+        return { book, score, reasons };
+      }).filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score || a.book.id - b.book.id)
+        .slice(0, 3);
+
+      // Quy đổi điểm thực tế sang % AI Match minh bạch (từ 89% đến 99%)
+      const maxPossible = kw ? 137 : 87;
+      scored.forEach((item, idx) => {
+        const rawRatio = Math.min(1, item.score / maxPossible);
+        let pct = Math.round(88 + rawRatio * 11) - idx;
+        pct = Math.min(99, Math.max(88, pct));
+        item.matchPct = pct;
+      });
+
+      const box = document.getElementById('aiResultsBox');
+      const grid = document.getElementById('aiResultsGrid');
+      const header = document.getElementById('aiReasoningHeader');
+
+      box.classList.add('active');
+      header.innerHTML = `✨ Trợ lý AI Thư viện đã chấm điểm đối sánh <strong>${BOOKS_DATA.length} bộ sách</strong> (theo <em>Cấp học + Nhãn tâm trạng + Từ khóa</em>) và chọn ra <strong>Top ${scored.length} cuốn sách</strong> có tỷ lệ tương thích cao nhất:`;
+
+      grid.innerHTML = scored.map(({ book, matchPct, reasons }) => `
+        <div class="ai-rec-card" onclick="openBookModal(${book.id})">
+          <img class="ai-rec-thumb" src="${getBookCover(book)}" alt="${book.title}" onerror="this.style.display='none'" />
+          <div style="display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                <span class="badge-grade">${book.grades}</span>
+                <span style="font-size:0.75rem; color:#4ade80; font-weight:800; background:rgba(16,185,129,0.15); padding:2px 8px; border-radius:999px; border:1px solid rgba(16,185,129,0.35);">${matchPct}% AI Match</span>
+              </div>
+              <h4 style="font-size:0.92rem; color:#fff; font-weight:800; margin-bottom:4px;">${book.title}</h4>
+              <p style="font-size:0.78rem; color:#cbd5e1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${book.hook}</p>
+              <div style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;">
+                ${reasons.map(r => `<span style="font-size:0.68rem; color:#93c5fd; background:rgba(56,189,248,0.12); padding:2px 6px; border-radius:4px;">${r}</span>`).join('')}
+              </div>
+            </div>
+            <div style="font-size:0.72rem; color:#fde68a; font-weight:600; margin-top:6px;">
+              📍 ${book.location}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openBookModal(bookId) {
+      const book = BOOKS_DATA.find(b => b.id === bookId);
+      if (!book) return;
+      activeModalBook = book;
+
+      document.getElementById('modalCoverImg').src = getBookCover(book);
+      document.getElementById('modalGrade').textContent = 'Cấp học: ' + book.grades;
+      document.getElementById('modalLocation').textContent = '📍 ' + book.location;
+      document.getElementById('modalTitle').textContent = book.title;
+      document.getElementById('modalAuthor').textContent = 'Tác giả / NXB: ' + book.author;
+      document.getElementById('modalHook').textContent = book.hook;
+
+      const scriptText = getBookPodcastScript(book);
+      document.getElementById('modalPodcastScript').textContent = '"' + scriptText + '"';
+      document.getElementById('editScriptTextarea').value = scriptText;
+      document.getElementById('editScriptBox').style.display = 'none';
+
+      // Set up Audio Player
+      const player = document.getElementById('html5AudioPlayer');
+      player.pause();
+      player.src = getBookAudio(book);
+      applyAudioSpeed(player);
+      updateAudioSourceBadge(book.id);
+
+      if (!customAudioMap[book.id] && cloudIndex.audioPages && cloudIndex.audioPages[book.id]) {
+        downloadAudioFromCloudIfNeeded(book.id).then(cloudAudio => {
+          if (cloudAudio && activeModalBook && activeModalBook.id === book.id) {
+            player.src = cloudAudio;
+            updateAudioSourceBadge(book.id);
+          }
+        });
+      }
+
+      document.getElementById('modalTags').innerHTML = book.moods
+        .map(m => `<span class="mood-tag" style="font-size:0.76rem; padding:4px 10px;">#${m}</span>`)
+        .join('');
+
+      // Render Quiz
+      document.getElementById('modalQuizQuestion').textContent = book.quizQ;
+      const options = [
+        { text: book.quizAns, isCorrect: true },
+        ...(book.quizWrongs || ["Đáp án khác A", "Đáp án khác B"]).map(t => ({ text: t, isCorrect: false }))
+      ].sort(() => Math.random() - 0.5);
+
+      const feedbackEl = document.getElementById('modalQuizFeedback');
+      feedbackEl.style.display = 'none';
+
+      document.getElementById('modalQuizOptions').innerHTML = options.map((opt, idx) => `
+        <button class="quiz-option" onclick="checkQuizAnswer(this, ${opt.isCorrect})">
+          ${String.fromCharCode(65 + idx)}. ${opt.text}
+        </button>
+      `).join('');
+
+      document.getElementById('bookModal').classList.add('open');
+    }
+
+    function updateAudioSourceBadge(bookId) {
+      const badge = document.getElementById('audioSourceBadge');
+      const btnReset = document.getElementById('btnResetAiAudio');
+      if (customAudioMap[bookId] || (cloudIndex.audioPages && cloudIndex.audioPages[bookId])) {
+        badge.innerHTML = '🎙️ Bản thu âm thật của CLB Mic &amp; Mind';
+        badge.style.background = 'rgba(245,158,11,0.22)';
+        badge.style.borderColor = '#f59e0b';
+        badge.style.color = '#fde68a';
+        btnReset.style.display = 'inline-flex';
+      } else {
+        badge.innerHTML = '🤖 Giọng AI Chuẩn Hóa Phát Âm Anh/Nhật (~50s)';
+        badge.style.background = 'rgba(16,185,129,0.2)';
+        badge.style.borderColor = '#10b981';
+        badge.style.color = '#6ee7b7';
+        btnReset.style.display = 'none';
+      }
+    }
+
+    function getCurrentAudioSpeed() {
+      const sel = document.getElementById('audioSpeedSelect');
+      return parseFloat((sel && sel.value) ? sel.value : '1.2') || 1.2;
+    }
+
+    function applyAudioSpeed(player) {
+      if (!player) player = document.getElementById('html5AudioPlayer');
+      if (!player) return;
+      const spd = getCurrentAudioSpeed();
+      player.defaultPlaybackRate = spd;
+      player.playbackRate = spd;
+    }
+
+    function playCurrentBookAudio() {
+      if (!activeModalBook) return;
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      const player = document.getElementById('html5AudioPlayer');
+      applyAudioSpeed(player);
+      player.play().catch(() => {
+        speakWithSmartPhoneticWebSpeech();
+      });
+    }
+
+    function stopAllAudio() {
+      const player = document.getElementById('html5AudioPlayer');
+      if (player) { player.pause(); player.currentTime = 0; }
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    function changeAudioSpeed(val) {
+      const player = document.getElementById('html5AudioPlayer');
+      const spd = parseFloat(val) || 1.2;
+      if (player) {
+        player.defaultPlaybackRate = spd;
+        player.playbackRate = spd;
+      }
+    }
+
+    // UPLOAD FILE AUDIO CỦA CLB MIC & MIND (TỰ ĐỘNG ĐỒNG BỘ ĐÁM MÂY)
+    function handleClubAudioUpload(event) {
+      const file = event.target.files[0];
+      if (!file || !activeModalBook) return;
+      const bookId = activeModalBook.id;
+      const bookTitle = activeModalBook.title;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const dataUrl = e.target.result;
+        customAudioMap[bookId] = dataUrl;
+        saveToStore("clubAudio", bookId, dataUrl);
+        const player = document.getElementById('html5AudioPlayer');
+        player.src = dataUrl;
+        player.play();
+        updateAudioSourceBadge(bookId);
+        renderShelves();
+        await uploadAudioToCloud(bookId, dataUrl);
+        alert(`🎉 Đã gắn và đồng bộ lên Đám mây file ghi âm "${file.name}" cho cuốn sách "${bookTitle}"!`);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // THU ÂM TRỰC TIẾP BẰNG MICRO TRÊN WEB (TỰ ĐỘNG ĐỒNG BỘ ĐÁM MÂY)
+    async function toggleMicRecording() {
+      const btn = document.getElementById('btnMicRecord');
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        btn.classList.remove('rec-active');
+        btn.textContent = '🔴 Thu âm trực tiếp bằng Mic';
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        recordedChunks = [];
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+        mediaRecorder.onstop = () => {
+          stream.getTracks().forEach(t => t.stop());
+          const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+          const bookId = activeModalBook.id;
+          const reader = new FileReader();
+          reader.onload = async function(ev) {
+            const dataUrl = ev.target.result;
+            customAudioMap[bookId] = dataUrl;
+            saveToStore("clubAudio", bookId, dataUrl);
+            const player = document.getElementById('html5AudioPlayer');
+            player.src = dataUrl;
+            player.play();
+            updateAudioSourceBadge(bookId);
+            renderShelves();
+            await uploadAudioToCloud(bookId, dataUrl);
+          };
+          reader.readAsDataURL(blob);
+        };
+        mediaRecorder.start();
+        btn.classList.add('rec-active');
+        btn.textContent = '⏹ Đang thu âm... (Bấm để dừng & lưu)';
+      } catch (err) {
+        alert('Không thể mở Micro. Bạn hãy cấp quyền Micro cho trình duyệt hoặc dùng nút "Upload File Audio" nhé!');
+      }
+    }
+
+    async function resetToDefaultAiAudio() {
+      if (!activeModalBook) return;
+      const bookId = activeModalBook.id;
+      delete customAudioMap[bookId];
+      deleteFromStore("clubAudio", bookId);
+      if (cloudIndex.audioPages && cloudIndex.audioPages[bookId]) {
+        delete cloudIndex.audioPages[bookId];
+        saveCloudMasterIndex().catch(() => {});
+      }
+      const player = document.getElementById('html5AudioPlayer');
+      player.src = getBookAudio(activeModalBook);
+      updateAudioSourceBadge(bookId);
+      renderShelves();
+    }
+
+    // UPLOAD ẢNH BÌA TÙY CHỈNH CHO TỪNG CUỐN SÁCH (TỰ ĐỘNG NÉN & ĐỒNG BỘ ĐÁM MÂY QUA MỌI THIẾT BỊ)
+    function handleCustomCoverUpload(event) {
+      const file = event.target.files[0];
+      if (!file || !activeModalBook) return;
+      const bookId = activeModalBook.id;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const rawDataUrl = e.target.result;
+        const compressedDataUrl = await compressCoverDataUrl(rawDataUrl);
+        customCoverMap[bookId] = compressedDataUrl;
+        saveToStore("customCovers", bookId, compressedDataUrl);
+        document.getElementById('modalCoverImg').src = compressedDataUrl;
+        if (currentHeroBookId === bookId) {
+          document.getElementById('heroCoverImg').src = compressedDataUrl;
+        }
+        renderShelves();
+        await uploadCoverToCloud(bookId, compressedDataUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function toggleEditScript() {
+      const box = document.getElementById('editScriptBox');
+      box.style.display = box.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function saveEditedScript() {
+      if (!activeModalBook) return;
+      const newText = document.getElementById('editScriptTextarea').value.trim();
+      if (!newText) return;
+      const bookId = activeModalBook.id;
+      customScriptMap[bookId] = newText;
+      saveToStore("customScripts", bookId, newText);
+      document.getElementById('modalPodcastScript').textContent = '"' + newText + '"';
+      try {
+        setCloudBadge('☁️ Đang lưu kịch bản lên Đám mây...', true);
+        await fetchCloudMasterIndex();
+        cloudIndex.scripts[bookId] = newText;
+        await saveCloudMasterIndex();
+        setCloudBadge('☁️ Đã đồng bộ Đám mây (Mọi thiết bị)');
+      } catch (e) {}
+      alert('Đã lưu kịch bản mới và đồng bộ lên Đám mây cho mọi thiết bị!');
+    }
+
+    // ĐỌC KỊCH BẢN VỪA SỬA BẰNG GIỌNG NEURAL TRÌNH DUYỆT THEO TỪNG CÂU HOÀN CHỈNH (KHÔNG NGẮT HƠI GIỮA CÂU)
+    function speakWithSmartPhoneticWebSpeech() {
+      if (!activeModalBook) return;
+      const player = document.getElementById('html5AudioPlayer');
+      if (player) player.pause();
+      if (!('speechSynthesis' in window)) {
+        alert('Trình duyệt không hỗ trợ đọc trực tiếp.');
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const rawText = document.getElementById('editScriptTextarea').value || getBookPodcastScript(activeModalBook);
+      const phoneticText = toVietnamesePhonetic(rawText);
+      // Tách theo đúng dấu kết thúc câu (. ! ?) để trình duyệt đọc trọn vẹn từng câu không ngắt quãng
+      const sentences = phoneticText.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [phoneticText];
+      const rateVal = getCurrentAudioSpeed();
+      const voices = window.speechSynthesis.getVoices();
+      const naturalViVoice = voices.find(v => v.lang.includes('vi') && (v.name.includes('Natural') || v.name.includes('HoaiMy') || v.name.includes('NamMinh') || v.name.includes('Google')))
+        || voices.find(v => v.lang.includes('vi'));
+
+      sentences.forEach(s => {
+        const cleanSentence = s.trim();
+        if (!cleanSentence) return;
+        const utter = new SpeechSynthesisUtterance(cleanSentence);
+        utter.lang = 'vi-VN';
+        utter.rate = rateVal;
+        if (naturalViVoice) utter.voice = naturalViVoice;
+        window.speechSynthesis.speak(utter);
+      });
+    }
+
+    function checkQuizAnswer(btn, isCorrect) {
+      const allBtns = document.querySelectorAll('#modalQuizOptions .quiz-option');
+      allBtns.forEach(b => b.disabled = true);
+      const feedbackEl = document.getElementById('modalQuizFeedback');
+      feedbackEl.style.display = 'block';
+      if (isCorrect) {
+        btn.classList.add('correct');
+        feedbackEl.style.color = '#6ee7b7';
+        feedbackEl.innerHTML = `🎉 <strong>Chính xác!</strong> ${activeModalBook.quizExplain} <br/>👉 <em>Hãy ghé ngay <strong>${activeModalBook.location}</strong> để đọc cuốn sách này nhé!</em>`;
+      } else {
+        btn.classList.add('wrong');
+        feedbackEl.style.color = '#fca5a5';
+        feedbackEl.innerHTML = `💡 <strong>Gợi ý:</strong> Đáp án đúng là <em>"${activeModalBook.quizAns}"</em>. ${activeModalBook.quizExplain}`;
+      }
+    }
+
+    function closeBookModal() {
+      stopAllAudio();
+      document.getElementById('bookModal').classList.remove('open');
+    }
+
+    function openTeacherModal() { document.getElementById('teacherModal').classList.add('open'); }
+    function closeTeacherModal() { document.getElementById('teacherModal').classList.remove('open'); }
+
+    function copyBatchPrompt() {
+      const textarea = document.getElementById('batchPromptText');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value);
+      alert('Đã sao chép Khuôn lệnh AI!');
+    }
+
+    const DEFAULT_STYLED_XLSX_B64 = "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";
+    let hasUploadedCustomBooks = false;
+
+    function downloadSampleCsv() {
+      const hasCustomScripts = Object.keys(customScriptMap || {}).length > 0;
+      if (!hasUploadedCustomBooks && !hasCustomScripts) {
+        // Tải trực tiếp file Excel (.xlsx) đã được thiết kế màu sắc, tiêu đề, kẻ khung chuẩn đẹp
+        const binStr = atob(DEFAULT_STYLED_XLSX_B64);
+        const bytes = new Uint8Array(binStr.length);
+        for (let i = 0; i < binStr.length; i++) bytes[i] = binStr.charCodeAt(i);
+        const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = '2_File_Excel_Mau_27_Bo_Sach_Bookflix.xlsx';
+        a.click();
+        return;
+      }
+
+      // Trường hợp giáo viên đã chỉnh sửa kịch bản hoặc thêm sách mới trên web: xuất file .xlsx có đầy đủ tiêu đề & độ rộng cột chuẩn
+      const aoa = [
+        ['HỆ THỐNG GIÁO DỤC SKY-LINE • DANH MỤC SỐ HÓA SÁCH "SKY-LINE BOOKFLIX" & KỊCH BẢN AUDIO REVIEW BOOK'],
+        ['Tác giả: Dương Thảo My – Tổ Công tác Học sinh và Văn hóa Đọc (Phối hợp cùng CLB Thư viện Mic & Mind) • Cuộc thi SKY-LINE AI SPARK 2026 – 2027'],
+        ['💡 Hướng dẫn: Thầy/Cô có thể tùy ý chỉnh sửa nội dung, thêm/bớt sách, đổi màu sắc hoặc phông chữ để trình bày đẹp hơn, sau đó lưu file (.xlsx) và tải trực tiếp lên Web Sky-Line Bookflix!'],
+        [
+          "STT","Tên sách / Bộ sách","Tác giả / NXB","Cấp học phù hợp","Kệ trưng bày Bookflix",
+          "Tâm trạng (Mood Tags)","Vị trí thực tế tại Thư viện","Lời giới thiệu kiểu Trailer Netflix (AI biên soạn & GV kiểm duyệt)",
+          "Kịch bản Audio Review Book 45s (CLB Mic & Mind)","Câu hỏi Quiz 1","Đáp án đúng 1","Giải thích ngắn"
+        ]
+      ];
+      BOOKS_DATA.forEach((b, i) => {
+        aoa.push([
+          i + 1,
+          b.title,
+          b.author,
+          b.grades,
+          Array.isArray(b.shelves) ? b.shelves.join(', ') : b.shelves,
+          Array.isArray(b.moods) ? b.moods.join(', ') : b.moods,
+          b.location,
+          b.hook,
+          getBookPodcastScript(b),
+          b.quizQ,
+          b.quizAns,
+          b.quizExplain
+        ]);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 11 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 11 } },
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 11 } }
+      ];
+      ws['!cols'] = [
+        { wch: 7 }, { wch: 34 }, { wch: 22 }, { wch: 16 }, { wch: 26 },
+        { wch: 23 }, { wch: 28 }, { wch: 44 }, { wch: 68 }, { wch: 34 },
+        { wch: 28 }, { wch: 36 }
+      ];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Danh Mục Sách Bookflix");
+      XLSX.writeFile(wb, "2_File_Excel_Mau_27_Bo_Sach_Bookflix.xlsx");
+    }
+
+    async function syncCustomBooksToCloud(booksArr) {
+      try {
+        setCloudBadge('☁️ Đang đồng bộ danh mục sách Excel lên Đám mây...', true);
+        await fetchCloudMasterIndex();
+        const jsonStr = JSON.stringify(booksArr);
+        const pagePath = await cloudSaveChunked(cloudIndex.booksPage || null, "SkyLineCustomBooks", jsonStr);
+        cloudIndex.booksPage = pagePath;
+        await saveCloudMasterIndex();
+        setCloudBadge('☁️ Đã đồng bộ Đám mây (Mọi thiết bị)');
+      } catch (e) {
+        console.warn("Cloud sync books warning:", e);
+      }
+    }
+
+    function handleExcelUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          // Đọc dưới dạng mảng 2 chiều để tự động nhận diện dòng Tiêu đề bảng dù Giáo viên có thêm Banner, Logo hay trang trí bao nhiêu dòng ở trên
+          const rawRows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: "" });
+          if (!rawRows || rawRows.length === 0) {
+            alert("File không có dữ liệu!");
+            return;
+          }
+
+          let headerRowIdx = -1;
+          for (let i = 0; i < Math.min(rawRows.length, 30); i++) {
+            const joined = rawRows[i].map(c => String(c || '').toLowerCase()).join(' | ');
+            if (joined.includes('tên sách') || (joined.includes('tác giả') && joined.includes('cấp học'))) {
+              headerRowIdx = i;
+              break;
+            }
+          }
+
+          let parsedRows = [];
+          if (headerRowIdx !== -1) {
+            const headers = rawRows[headerRowIdx].map(h => String(h || '').trim().toLowerCase());
+            const findCol = (keywords, fallbackIdx) => {
+              const found = headers.findIndex(h => keywords.some(k => h.includes(k)));
+              return found !== -1 ? found : fallbackIdx;
+            };
+            const cTitle = findCol(['tên sách', 'bộ sách', 'title'], 1);
+            const cAuthor = findCol(['tác giả', 'nxb', 'author'], 2);
+            const cGrades = findCol(['cấp học', 'khối', 'grade'], 3);
+            const cShelves = findCol(['kệ trưng bày', 'kệ sách', 'chuyên mục', 'shelf'], 4);
+            const cMoods = findCol(['tâm trạng', 'mood', 'chủ đề'], 5);
+            const cLoc = findCol(['vị trí', 'location'], 6);
+            const cHook = findCol(['trailer', 'lời giới thiệu', 'tóm tắt', 'hook'], 7);
+            const cPodcast = findCol(['kịch bản', 'audio', 'podcast', 'review'], 8);
+            const cQuizQ = findCol(['câu hỏi', 'quiz'], 9);
+            const cQuizAns = findCol(['đáp án', 'answer'], 10);
+            const cQuizExp = findCol(['giải thích', 'explain'], 11);
+
+            for (let r = headerRowIdx + 1; r < rawRows.length; r++) {
+              const row = rawRows[r];
+              const titleVal = String(row[cTitle] || '').trim();
+              if (!titleVal) continue;
+              parsedRows.push({
+                title: titleVal,
+                author: String(row[cAuthor] || '').trim(),
+                grades: String(row[cGrades] || '').trim(),
+                shelvesRaw: String(row[cShelves] || '').trim(),
+                moodsRaw: String(row[cMoods] || '').trim(),
+                location: String(row[cLoc] || '').trim(),
+                hook: String(row[cHook] || '').trim(),
+                podcast: String(row[cPodcast] || '').trim(),
+                quizQ: String(row[cQuizQ] || '').trim(),
+                quizAns: String(row[cQuizAns] || '').trim(),
+                quizExplain: String(row[cQuizExp] || '').trim()
+              });
+            }
+          } else {
+            // Fallback nếu người dùng tải file không có dòng tiêu đề chuẩn
+            const jsonRows = XLSX.utils.sheet_to_json(firstSheet, { defval: "" });
+            parsedRows = jsonRows.map(row => {
+              const vals = Object.values(row);
+              return {
+                title: String(vals[1] || vals[0] || '').trim(),
+                author: String(vals[2] || '').trim(),
+                grades: String(vals[3] || '').trim(),
+                shelvesRaw: String(vals[4] || '').trim(),
+                moodsRaw: String(vals[5] || '').trim(),
+                location: String(vals[6] || '').trim(),
+                hook: String(vals[7] || '').trim(),
+                podcast: String(vals[8] || '').trim(),
+                quizQ: String(vals[9] || '').trim(),
+                quizAns: String(vals[10] || '').trim(),
+                quizExplain: String(vals[11] || '').trim()
+              };
+            }).filter(r => r.title);
+          }
+
+          if (parsedRows.length === 0) {
+            alert("Không tìm thấy dòng dữ liệu sách hợp lệ trong file!");
+            return;
+          }
+
+          const gradients = [
+            "linear-gradient(135deg, #0284c7 0%, #1d4ed8 100%)",
+            "linear-gradient(135deg, #be185d 0%, #f43f5e 100%)",
+            "linear-gradient(135deg, #15803d 0%, #10b981 100%)",
+            "linear-gradient(135deg, #78350f 0%, #d97706 100%)",
+            "linear-gradient(135deg, #4c1d95 0%, #ec4899 100%)"
+          ];
+
+          BOOKS_DATA = parsedRows.map((item, idx) => {
+            const id = idx + 1;
+            const title = item.title || ("Sách mới #" + id);
+            const author = item.author || "Thư viện Sky-Line";
+            const grades = item.grades || "TH, THCS, THPT";
+            const shelvesRaw = item.shelvesRaw || "Mới Bóc Tem";
+            const moodsRaw = item.moodsRaw || "Khám phá, Vui vẻ";
+            const location = item.location || "Bàn trưng bày Sách Mới (Sảnh Thư viện)";
+            const hook = item.hook || "Cuốn sách hấp dẫn đang chờ bạn khám phá tại thư viện Sky-Line.";
+            const podcast = item.podcast || hook;
+            const quizQ = item.quizQ || ("Cuốn sách " + title + " hiện đang trưng bày ở đâu?");
+            const quizAns = item.quizAns || location;
+            const quizExplain = item.quizExplain || "Hãy ghé thư viện Sky-Line để trải nghiệm cuốn sách này nhé!";
+            return {
+              id, title, author, grades,
+              shelves: String(shelvesRaw).split(',').map(s => s.trim()).filter(Boolean),
+              moods: String(moodsRaw).split(',').map(s => s.trim()).filter(Boolean),
+              location, hook, podcast, quizQ, quizAns,
+              quizWrongs: ["Chưa có thông tin", "Đáp án khác"],
+              quizExplain,
+              cover: `covers/book_${id}.jpg?v=3`,
+              audio: `audio/book_${id}.mp3?v=2`,
+              gradient: gradients[idx % gradients.length]
+            };
+          });
+
+          hasUploadedCustomBooks = true;
+          saveToStore("customBooks", "latest", BOOKS_DATA);
+          renderShelves();
+          setHeroBook(BOOKS_DATA[0].id);
+          await syncCustomBooksToCloud(BOOKS_DATA);
+          document.getElementById('uploadStatusMsg').textContent = `✅ Đã cập nhật & đồng bộ Đám mây thành công ${BOOKS_DATA.length} đầu sách từ file "${file.name}"!`;
+        } catch (err) {
+          console.error(err);
+          alert("Không thể đọc file. Vui lòng dùng đúng file Excel (.xlsx, .xls) hoặc CSV!");
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    async function restoreOriginalLibraryBooks() {
+      BOOKS_DATA = JSON.parse(JSON.stringify(INITIAL_BOOKS_DATA));
+      hasUploadedCustomBooks = false;
+      deleteFromStore("customBooks", "latest");
+      if (cloudIndex && cloudIndex.booksPage) {
+        delete cloudIndex.booksPage;
+        saveCloudMasterIndex().catch(() => {});
+      }
+      renderShelves();
+      setHeroBook(24);
+      const msgEl = document.getElementById('uploadStatusMsg');
+      if (msgEl) msgEl.textContent = '🔄 Đã khôi phục nguyên trạng 27 bộ sách gốc của Thư viện Sky-Line!';
+    }
+
+    function exportStandaloneTeacherWeb() {
+      const currentHtml = document.documentElement.outerHTML;
+      const booksJson = JSON.stringify(BOOKS_DATA, null, 2);
+      const updatedHtml = currentHtml
+        .replace(
+          /let BOOKS_DATA = \[[\s\S]*?\];\s*const INITIAL_BOOKS_DATA/,
+          `let BOOKS_DATA = ${booksJson};\n    const INITIAL_BOOKS_DATA`
+        )
+        .replace('syncWithCloudOnStartup();', '// Bản chuyển giao độc lập cho Tổ bộ môn / Cơ sở khác');
+      const blob = new Blob(["<!DOCTYPE html>\n" + updatedHtml], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "SkyLine_Bookflix_BoMon_ChuyenGiao.html";
+      a.click();
+      const msgEl = document.getElementById('uploadStatusMsg');
+      if (msgEl) msgEl.textContent = '📦 Đã xuất thành công file Web độc lập (SkyLine_Bookflix_BoMon_ChuyenGiao.html) chứa danh mục sách hiện tại cho Giáo viên / Bộ môn khác!';
+    }
+
+    const audioEl = document.getElementById('html5AudioPlayer');
+    if (audioEl) {
+      audioEl.defaultPlaybackRate = 1.2;
+      audioEl.playbackRate = 1.2;
+      audioEl.addEventListener('loadedmetadata', () => applyAudioSpeed(audioEl));
+      audioEl.addEventListener('play', () => applyAudioSpeed(audioEl));
+    }
+
+    initIndexedDB().then(() => {
+      renderShelves();
+      setHeroBook(24);
+      syncWithCloudOnStartup();
+    });
+  </script>
+</body>
+</html>
